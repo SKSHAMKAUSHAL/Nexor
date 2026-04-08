@@ -18,9 +18,9 @@
 ## ✨ Features
 
 - 🔐 **Secure Authentication** - Firebase Auth with protected routes
-- 🛒 **Smart Shopping Cart** - Redux-powered state management
-- 💳 **Payment Integration** - Razorpay checkout
-- 👨‍💼 **Admin Dashboard** - Complete product & order management
+- 🛒 **Smart Shopping Cart** - Redux-powered state manageMant
+- 💳 **PayMant Integration** - Razorpay checkout
+- 👨‍💼 **Admin Dashboard** - Complete product & order manageMant
 - 🌓 **Dark Mode** - Seamless theme switching
 - 📱 **Fully Responsive** - Mobile-first design
 - 🎨 **Modern UI** - Tailwind CSS with smooth animations
@@ -47,7 +47,7 @@ VITE_STORAGE_BUCKET=your_storage_bucket
 VITE_MESSAGING_SENDER_ID=your_sender_id
 VITE_APP_ID=your_app_id
 
-# Start development server
+# Start developMant server
 npm run dev
 ```
 
@@ -64,7 +64,7 @@ npm run dev
 - Firebase Authentication
 - Firebase Storage
 
-**Payment:**
+**PayMant:**
 - Razorpay Integration
 
 ## 📂 Project Structure
@@ -73,7 +73,7 @@ npm run dev
 src/
 ├── components/         # Reusable UI components
 ├── pages/             # Page components & routes
-├── context/           # Global state management
+├── context/           # Global state manageMant
 ├── redux/             # Redux store & slices
 ├── fireabase/         # Firebase configuration
 └── utils/             # Helper functions
@@ -91,12 +91,12 @@ src/
 ```javascript
 rules_version = '2';
 service cloud.firestore {
-  match /databases/{database}/documents {
-    match /products/{document=**} {
+  match /databases/{database}/docuMants {
+    match /products/{docuMant=**} {
       allow read: if true;
       allow write: if request.auth != null;
     }
-    match /orders/{document=**} {
+    match /orders/{docuMant=**} {
       allow read, write: if request.auth != null;
     }
     match /users/{userId} {
@@ -120,21 +120,21 @@ if (admin?.user?.email === 'your-admin-email@gmail.com') {
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start development server |
+| `npm run dev` | Start developMant server |
 | `npm run build` | Build for production |
 | `npm run preview` | Preview production build |
 | `npm run lint` | Run ESLint |
 
-## 🌐 Deployment
+## 🌐 DeployMant
 
-### Netlify (Recommended)
+### Netlify (RecomManded)
 
 ```bash
 npm run build
 # Deploy dist/ folder to Netlify
 ```
 
-Or connect your GitHub repository to Netlify for automatic deployments.
+Or connect your GitHub repository to Netlify for automatic deployMants.
 
 ## 📸 Screenshots
 

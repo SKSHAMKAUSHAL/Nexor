@@ -1,0 +1,24 @@
+CONTEXT & GOAL:
+Act as an expert Frontend/UI Developer. I am building a pixel-perfect clone of the NikeIndia website (nike.in). 
+
+PROJECT ARCHITECTURE (APPLY TO EVERY PAGE):
+Instead of just generating a single HTML/UI file, establish a component-driven, global structure so the Nikebranding and shell exist on EVERY page in the project. Please follow these structural rules:
+
+1. Global Layout / Wrapper: 
+Create a 'Layout' component (e.g., layout.tsx in Next.js, or App.jsx in React) that wraps around {children}. The Layout must include:
+  - <TopUtilityBar />
+  - <MainNavigation />
+  - <main className="min-h-screen">{children}</main>
+  - <Footer />
+This ensures every new page we build automatically has the Nikeheader, fonts, and footer.
+
+2. Global CSS & Design System:
+Establish global CSS rules applied project-wide:
+  - Font: Bold, clean sans-serif (Helvetica Neue/Roboto).
+  - Background: White.
+  - Colors: Primary Black (#111), Primary White (#FFF), Off-white/Gray (#F5F5F5) for section backgrounds.
+  - Borders/Corners: Buttons are fully rounded (pill-shaped `rounded-full`). Product images have zero border-radius (`rounded-none`).
+
+COMPONENT BREAKDOWNS (UI SPECIFICATIONS):
+
+... (Truncated for brevity) ...
