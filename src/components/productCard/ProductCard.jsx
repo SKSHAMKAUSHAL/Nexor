@@ -1,18 +1,20 @@
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import myContext from '../../context/data/myContext'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../../redux/cartSlice'
+import { addToWishlist, removeFromWishlist } from '../../redux/wishlistSlice'
 import { toast } from 'react-toastify'
 import { FaShoppingCart, FaEye, FaHeart } from 'react-icons/fa'
 
 function ProductCard() {
     const context = useContext(myContext)
-    const { mode, product ,searchkey, filterType, filterPrice, 
-            wishlist, getWishlistData, addToWishlistBackend, removeFromWishlistBackend} = context
+    const { mode, product, searchkey, filterType, filterPrice 
+            } = context
 
     const dispatch = useDispatch()
     const navigate = useNavigate();
+    const wishlist = useSelector((state) => state.wishlist);
 
     // Get user from localStorage
     const user = JSON.parse(localStorage.getItem('user') || 'null');
@@ -89,14 +91,6 @@ function ProductCard() {
         };
     }, [imageIntervals]);
 
-    // Load wishlist on component mount
-    useEffect(() => {
-        if (userId) {
-            getWishlistData(userId);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userId]);
-
     const addCart = (e, product)=> {
         e.stopPropagation();
         const payload = sanitizeForCart(product);
@@ -106,19 +100,16 @@ function ProductCard() {
 
     const toggleWishlist = (e, product) => {
         e.stopPropagation();
-        if (!userId) {
-            toast.error('Please login to add to wishlist');
-            navigate('/login');
-            return;
-        }
-
-        const isInWishlist = wishlist.some(item => item.productId === product.id);
+        
+        const payload = sanitizeForCart(product);
+        const isInWishlist = wishlist.some(item => item.id === product.id);
         
         if (isInWishlist) {
-            const wishlistItem = wishlist.find(item => item.productId === product.id);
-            removeFromWishlistBackend(wishlistItem.id, userId);
+            dispatch(removeFromWishlist(product.id));
+            toast.info('Removed from wishlist');
         } else {
-            addToWishlistBackend(product, userId);
+            dispatch(addToWishlist(payload));
+            toast.success('Added to wishlist ❤️');
         }
     };
 
@@ -184,7 +175,7 @@ function ProductCard() {
                             .filter((obj) => matchType(obj, filterType))
                             .filter((obj) => inPriceRange(obj.price, filterPrice)).slice(0,8).map((item, index) => {
                         const { title, price, id, category } = item;
-                        const isInWishlist = wishlist.some(wishItem => wishItem.productId === id);
+                        const isInWishlist = wishlist.some(wishItem => wishItem.id === id);
                         const productImages = getProductImages(item);
                         const currentImg = currentImageIndex[id] || 0;
                         

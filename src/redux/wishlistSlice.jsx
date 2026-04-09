@@ -3,7 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const getInitialWishlist = () => {
     try {
         const raw = localStorage.getItem('wishlist');
-        return raw ? JSON.parse(raw) : [];
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
     } catch {
         return [];
     }

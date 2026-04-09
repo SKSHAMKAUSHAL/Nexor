@@ -6,8 +6,12 @@ import myContext from "../../context/data/myContext";
 import { toast } from "react-toastify";
 import { FaTimes } from "react-icons/fa";
 import { Transition, Dialog } from "@headlessui/react";
+import { useDispatch, useSelector } from 'react-redux';
+import { addToWishlist, removeFromWishlist } from '../../redux/wishlistSlice';
 
 function Allproducts() {
+  const dispatch = useDispatch();
+  const wishlist = useSelector((state) => state.wishlist);
   const context = useContext(myContext);
   const {
     product,
@@ -16,10 +20,6 @@ function Allproducts() {
     filterPrice,
     filterSize,
     filterColor,
-    wishlist,
-    getWishlistData,
-    addToWishlistBackend,
-    removeFromWishlistBackend,
   } = context;
 
   const navigate = useNavigate();
@@ -38,26 +38,26 @@ function Allproducts() {
     return [item.imageUrl];
   };
 
-  useEffect(() => {
-    if (userId) {
-      getWishlistData(userId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
-
   const toggleWishlist = (e, product) => {
     e.stopPropagation();
-    if (!userId) {
-      toast.error("Please login to add to wishlist");
-      navigate("/login");
-      return;
-    }
-    const isInWishlist = wishlist.some(item => item.productId === product.id);
+    
+    // We assume you have sanitizeForCart or similar in Allproducts if needed. If not, we just pass the product minus circular/Firestore ref
+    const payload = {
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        category: product.category,
+        description: product.description
+    };
+    
+    const isInWishlist = wishlist.some(item => item.id === product.id);
     if (isInWishlist) {
-      const wishlistItem = wishlist.find(item => item.productId === product.id);
-      removeFromWishlistBackend(wishlistItem.id, userId);
+      dispatch(removeFromWishlist(product.id));
+      toast.info('Removed from wishlist');
     } else {
-      addToWishlistBackend(product, userId);
+      dispatch(addToWishlist(payload));
+      toast.success('Added to wishlist ❤️');
     }
   };
 
@@ -190,7 +190,7 @@ function Allproducts() {
                 <div className={`grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-10 ${showDesktopFilter ? 'lg:grid-cols-3 xl:grid-cols-4' : 'lg:grid-cols-4 xl:grid-cols-5'}`}>
               {filteredProducts.map((item, index) => {
                 const { title, price, id, category } = item;
-                const isInWishlist = wishlist.some(wishItem => wishItem.productId === id);
+                const isInWishlist = wishlist.some(wishItem => wishItem.id === id);
                 const productImages = getProductImages(item);
                 
                 return (

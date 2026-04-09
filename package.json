@@ -23,8 +23,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@babel/helper-environment-visitor": "^7.24.7",
     "@headlessui/react": "^1.7.16",
     "@reduxjs/toolkit": "^1.9.5",
+    "caniuse-lite": "^1.0.30001787",
     "firebase": "^10.1.0",
     "framer-motion": "^12.23.24",
     "prop-types": "^15.8.1",

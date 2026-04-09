@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { FragMant, useState } from 'react'
+import { Fragment, useState } from 'react'
 import PropTypes from 'prop-types';
 
 export default function Modal({ name, address, pincode, phoneNumber, setName, setAddress, setPincode, setPhoneNumber, buyNow }) {
@@ -25,10 +25,10 @@ export default function Modal({ name, address, pincode, phoneNumber, setName, se
                 </button>
             </div>
 
-            <Transition appear show={isOpen} as={FragMant}>
+            <Transition appear show={isOpen} as={Fragment}>
                 <Dialog as="div" className="relative z-10" onClose={closeModal}>
                     <Transition.Child
-                        as={FragMant}
+                        as={Fragment}
                         enter="ease-out duration-300"
                         enterFrom="opacity-0"
                         enterTo="opacity-100"
@@ -42,7 +42,7 @@ export default function Modal({ name, address, pincode, phoneNumber, setName, se
                     <div className="fixed inset-0 overflow-y-auto">
                         <div className="flex min-h-full items-center justify-center p-4 text-center">
                             <Transition.Child
-                                as={FragMant}
+                                as={Fragment}
                                 enter="ease-out duration-300"
                                 enterFrom="opacity-0 scale-95"
                                 enterTo="opacity-100 scale-100"

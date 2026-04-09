@@ -3,7 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const getInitialCart = () => {
     try {
         const raw = localStorage.getItem('cart');
-        return raw ? JSON.parse(raw) : [];
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
     } catch {
         return [];
     }

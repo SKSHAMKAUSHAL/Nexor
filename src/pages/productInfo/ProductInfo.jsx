@@ -2,21 +2,24 @@ import { useContext, useEffect, useState } from 'react'
 import Layout from '../../components/layout/Layout'
 import myContext from '../../context/data/myContext';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { doc, getDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { addToCart } from '../../redux/cartSlice';
+import { addToWishlist, removeFromWishlist } from '../../redux/wishlistSlice';
 import { fireDB } from '../../firebase/FirebaseConfig';
 import { FaHeart, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
 
 function ProductInfo() {
     const context = useContext(myContext);
-    const { setLoading, wishlist, getWishlistData, addToWishlistBackend, removeFromWishlistBackend, mode } = context;
+    const { setLoading, mode } = context;
 
     const [products, setProducts] = useState('')
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const params = useParams()
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const wishlist = useSelector((state) => state.wishlist);
     
     // Get user from localStorage
     const user = JSON.parse(localStorage.getItem('user') || 'null');
@@ -46,10 +49,6 @@ function ProductInfo() {
         getProductData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
-
-
-    const dispatch = useDispatch()
 
     const [selectedVariation, setSelectedVariation] = useState('');
 
@@ -85,14 +84,6 @@ function ProductInfo() {
         };
     };
 
-    // Load wishlist on component mount
-    useEffect(() => {
-        if (userId) {
-            getWishlistData(userId);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userId]);
-
     // add to cart
     const addCart = (products) => {
         const payload = sanitizeForCart(products, selectedVariation);
@@ -102,23 +93,19 @@ function ProductInfo() {
 
     // toggle wishlist
     const toggleWishlist = () => {
-        if (!userId) {
-            toast.error('Please login to add to wishlist');
-            navigate('/login');
-            return;
-        }
-
-        const isInWishlist = wishlist.some(item => item.productId === products.id);
+        const payload = sanitizeForCart(products, selectedVariation);
+        const isInWishlist = wishlist.some(item => item.id === products.id);
         
         if (isInWishlist) {
-            const wishlistItem = wishlist.find(item => item.productId === products.id);
-            removeFromWishlistBackend(wishlistItem.id, userId);
+            dispatch(removeFromWishlist(products.id));
+            toast.info('Removed from wishlist');
         } else {
-            addToWishlistBackend(products, userId);
+            dispatch(addToWishlist(payload));
+            toast.success('Added to wishlist ❤️');
         }
     }
 
-    const isInWishlist = wishlist.some(item => item.productId === products.id);
+    const isInWishlist = wishlist.some(item => item.id === products.id);
 
 
     const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);

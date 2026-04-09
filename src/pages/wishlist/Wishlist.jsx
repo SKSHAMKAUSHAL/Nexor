@@ -1,38 +1,31 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import myContext from '../../context/data/myContext';
 import Layout from '../../components/layout/Layout';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../../redux/cartSlice';
+import { removeFromWishlist } from '../../redux/wishlistSlice';
 import { toast } from 'react-toastify';
 import { FaHeart, FaShoppingCart, FaTrash, FaStar } from 'react-icons/fa';
 
 function Wishlist() {
   const context = useContext(myContext);
-  const { mode, wishlist, getWishlistData, removeFromWishlistBackend, loading } = context;
+  const { mode, loading } = context;
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const wishlist = useSelector(state => state.wishlist);
 
   // Get user from localStorage
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   const userId = user?.user?.uid;
 
-  // Load wishlist on component mount
-  useEffect(() => {
-    if (userId) {
-      getWishlistData(userId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
-
-  const removeFromWishlistHandler = (wishlistItemId) => {
-    if (userId) {
-      removeFromWishlistBackend(wishlistItemId, userId);
-    }
+  const removeFromWishlistHandler = (product) => {
+      dispatch(removeFromWishlist(product.id));
+      toast.info('Removed from wishlist');
   };
 
   const addToCartHandler = (item) => {
-    dispatch(addToCart(item.product));
+    dispatch(addToCart(item));
     toast.success('Added to cart! 🛒');
   };
 
@@ -47,7 +40,8 @@ function Wishlist() {
     );
   }
 
-  // Show login prompt if not logged in
+  // Allow viewing wishlist offline 
+  /*
   if (!userId) {
     return (
       <Layout>
@@ -71,6 +65,7 @@ function Wishlist() {
       </Layout>
     );
   }
+  */
 
   return (
     <Layout>
@@ -108,7 +103,7 @@ function Wishlist() {
                   }}>
                   {/* Delete Button */}
                   <button
-                    onClick={() => removeFromWishlistHandler(item.id)}
+                    onClick={() => removeFromWishlistHandler(item)}
                       className="absolute top-4 right-4 z-10 p-3 bg-white rounded-full shadow-lg transition-all duration-300 hover:bg-black hover:text-white hover:scale-110"
                       style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : 'white' }}>
                       <FaTrash />
@@ -117,10 +112,10 @@ function Wishlist() {
                     {/* Image */}
                     <div 
                       className="relative cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800"
-                      onClick={() => navigate(`/productinfo/${item.product.id}`)}>
+                      onClick={() => navigate(`/productinfo/${item.id}`)}>
                       <img
-                        src={item.product.imageUrl}
-                        alt={item.product.title}
+                        src={item.imageUrl}
+                        alt={item.title}
                         className="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                       
@@ -135,18 +130,18 @@ function Wishlist() {
                       <h2
                         className="text-xs tracking-widest mb-2 font-medium"
                         style={{ color: mode === 'dark' ? '#9ca3af' : '#6b7280' }}>
-                        {item.product.category}
+                        {item.category}
                       </h2>
                       <h1
                         className="text-lg font-bold mb-2 line-clamp-2 transition-colors duration-300"
                         style={{ color: mode === 'dark' ? 'white' : '#1f2937' }}>
-                        {item.product.title}
+                        {item.title}
                       </h1>
   
                       {/* Price and Rating */}
                       <div className="flex items-center justify-between mb-4">
                         <p className="text-xl font-bold">
-                          ₹{item.product.price}
+                          ₹{item.price}
                         </p>
                         <div className="flex items-center gap-1 text-black dark:text-white">
                           <FaStar />

@@ -20,17 +20,6 @@ function Cart() {
   // Check if user is logged in
   const user = JSON.parse(localStorage.getItem('user') || 'null');
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!user) {
-      toast.error('Please login to view your cart', {
-        position: "top-center",
-        autoClose: 3000,
-      });
-      navigate('/login');
-    }
-  }, [user, navigate]);
-
   const deleteCart = (item) => {
     dispatch(deleteFromCart(item));
     toast.success('Removed from cart', {
@@ -64,9 +53,8 @@ function Cart() {
   const [phoneNumber, setPhoneNumber] = useState('');
 
   const buyNow = async () => {
-    // Check if user is logged in
     if (!user) {
-      toast.error('Please login to place an order', { position: "top-center" });
+      toast.error('Please login to checkout', { position: "top-center" });
       navigate('/login');
       return;
     }
@@ -97,8 +85,8 @@ function Cart() {
       cartItems,
       addressInfo,
       date: addressInfo.date,
-      email: user.user.email,
-      userid: user.user.uid,
+      email: user?.user?.email || 'guest@example.com',
+      userid: user?.user?.uid || 'guest',
     };
 
     try {
@@ -132,10 +120,9 @@ function Cart() {
     }
   };
 
-  // Don't render anything if user is not logged in (redirect will happen)
-  if (!user) {
-    return null;
-  }
+  // We don't want to redirect entirely for Cart page anymore
+  // Users should be able to see their cart as guests
+  // if (!user) { return null; }
 
   // Empty cart state
   if (cartItems.length === 0) {
@@ -416,17 +403,29 @@ function Cart() {
 
                 {/* Only show Buy Now button when cart has items */}
                 {cartItems.length > 0 && (
-                  <Modal
-                    name={name}
-                    address={address}
-                    pincode={pincode}
-                    phoneNumber={phoneNumber}
-                    setName={setName}
-                    setAddress={setAddress}
-                    setPincode={setPincode}
-                    setPhoneNumber={setPhoneNumber}
-                    buyNow={buyNow}
-                  />
+                  user ? (
+                    <Modal
+                      name={name}
+                      address={address}
+                      pincode={pincode}
+                      phoneNumber={phoneNumber}
+                      setName={setName}
+                      setAddress={setAddress}
+                      setPincode={setPincode}
+                      setPhoneNumber={setPhoneNumber}
+                      buyNow={buyNow}
+                    />
+                  ) : (
+                    <button
+                      onClick={() => {
+                        toast.error('Please login to checkout', { position: 'top-center' });
+                        navigate('/login');
+                      }}
+                      className="w-full bg-violet-600 py-2 text-center rounded-lg text-white font-bold"
+                    >
+                      Buy Now
+                    </button>
+                  )
                 )}
 
                 {/* Trust Badges */}

@@ -1,4 +1,4 @@
-import { FragMant, useState, useContext } from 'react';
+import { Fragment, useState, useContext } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteFromCart, increMantQuantity, decreMantQuantity } from '../../redux/cartSlice';
@@ -80,11 +80,11 @@ function FloatingCart() {
       </button>
 
       {/* Slide-out Drawer */}
-      <Transition.Root show={isOpen} as={FragMant}>
+      <Transition.Root show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-[60]" onClose={setIsOpen}>
           {/* Background overlay */}
           <Transition.Child
-            as={FragMant}
+            as={Fragment}
             enter="ease-in-out duration-300"
             enterFrom="opacity-0"
             enterTo="opacity-100"
@@ -99,7 +99,7 @@ function FloatingCart() {
             <div className="absolute inset-0 overflow-hidden">
               <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
                 <Transition.Child
-                  as={FragMant}
+                  as={Fragment}
                   enter="transform transition ease-in-out duration-300"
                   enterFrom="translate-x-full"
                   enterTo="translate-x-0"
