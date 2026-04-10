@@ -25,7 +25,21 @@ function Wishlist() {
   };
 
   const addToCartHandler = (item) => {
-    dispatch(addToCart(item));
+    // Validate item before adding to cart
+    if (!item || !item.id || !item.title || item.price === undefined) {
+      toast.error('Error adding product to cart');
+      console.error('Invalid wishlist item:', item);
+      return;
+    }
+    const cartItem = {
+      id: item.id || '',
+      title: item.title || '',
+      price: item.price || 0,
+      imageUrl: item.imageUrl || '',
+      description: item.description || '',
+      category: item.category || ''
+    };
+    dispatch(addToCart(cartItem));
     toast.success('Added to cart! 🛒');
   };
 

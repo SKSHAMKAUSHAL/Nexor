@@ -10,15 +10,23 @@ import { getThemeColors } from '../../utils/colorUtils';
 
 function FloatingCart() {
   const [isOpen, setIsOpen] = useState(false);
-  const cartItems = useSelector((state) => state.cart);
+  let cartItems = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const context = useContext(myContext);
   const { mode } = context;
   const colors = getThemeColors(mode);
 
+  // Validate cart items
+  if (!Array.isArray(cartItems)) {
+    cartItems = [];
+  }
+  
+  // Filter invalid items
+  const validCartItems = cartItems.filter(item => item && item.id && item.title && item.price !== undefined);
+
   // Calculate subtotal
-  const subtotal = cartItems.reduce((total, item) => {
+  const subtotal = validCartItems.reduce((total, item) => {
     const price = parseFloat(item.price) || 0;
     const quantity = parseInt(item.quantity) || 1;
     return total + (price * quantity);
@@ -30,14 +38,17 @@ function FloatingCart() {
   };
 
   const handleDelete = (item) => {
+    if (!item || !item.id) return;
     dispatch(deleteFromCart(item));
   };
 
   const handleIncreMant = (item) => {
+    if (!item || !item.id) return;
     dispatch(increMantQuantity(item));
   };
 
   const handleDecreMant = (item) => {
+    if (!item || !item.id) return;
     dispatch(decreMantQuantity(item));
   };
 
@@ -54,7 +65,7 @@ function FloatingCart() {
         aria-label="Open cart"
       >
         <FaShoppingCart className="w-6 h-6" />
-        {cartItems.length > 0 && (
+        {validCartItems.length > 0 && (
           <span
             className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold animate-pulse"
             style={{
@@ -62,7 +73,7 @@ function FloatingCart() {
               color: 'white',
             }}
           >
-            {cartItems.length}
+            {validCartItems.length}
           </span>
         )}
         
@@ -75,7 +86,7 @@ function FloatingCart() {
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
           }}
         >
-          View Cart ({cartItems.length})
+          View Cart ({validCartItems.length})
         </span>
       </button>
 
@@ -125,7 +136,7 @@ function FloatingCart() {
                           style={{ color: colors.text.primary }}
                         >
                           <FaShoppingCart className="w-5 h-5" style={{ color: colors.primary.main }} />
-                          Shopping Cart ({cartItems.length})
+                          Shopping Cart ({validCartItems.length})
                         </Dialog.Title>
                         <button
                           type="button"
@@ -150,7 +161,7 @@ function FloatingCart() {
 
                       {/* Cart Items */}
                       <div className="flex-1 overflow-y-auto px-4 py-6">
-                        {cartItems.length === 0 ? (
+                        {validCartItems.length === 0 ? (
                           <div className="flex flex-col items-center justify-center h-full py-12">
                             <FaShoppingCart 
                               className="w-20 h-20 mb-4 opacity-30"
@@ -184,7 +195,7 @@ function FloatingCart() {
                           </div>
                         ) : (
                           <div className="space-y-4">
-                            {cartItems.map((item, index) => (
+                            {validCartItems.map((item, index) => (
                               <div
                                 key={`${item.id}-${index}`}
                                 className="flex gap-4 p-4 rounded-lg transition-all duration-200"

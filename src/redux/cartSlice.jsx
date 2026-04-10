@@ -3,9 +3,17 @@ import { createSlice } from "@reduxjs/toolkit";
 const getInitialCart = () => {
     try {
         const raw = localStorage.getItem('cart');
-        const parsed = raw ? JSON.parse(raw) : [];
-        return Array.isArray(parsed) ? parsed : [];
-    } catch {
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) {
+            localStorage.removeItem('cart');
+            return [];
+        }
+        // Validate cart items have required fields
+        return parsed.filter(item => item && item.id && item.title && item.price !== undefined);
+    } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
+        localStorage.removeItem('cart');
         return [];
     }
 };
@@ -19,13 +27,29 @@ const cartSlice = createSlice({
         addToCart(state, action){
             // Consider selectedVariation when identifying unique cart entries
             const payload = action.payload || {};
+            
+            // Validate required fields
+            if (!payload.id || !payload.title || payload.price === undefined) {
+                console.warn('Invalid product data for cart:', payload);
+                return;
+            }
+            
             const existingItem = state.find(item => (
                 item.id === payload.id && ((item.selectedVariation || '') === (payload.selectedVariation || ''))
             ));
             if (existingItem) {
                 existingItem.quantity = (existingItem.quantity || 1) + 1;
             } else {
-                state.push({ ...payload, quantity: 1 });
+                const newItem = {
+                    ...payload,
+                    quantity: 1,
+                    // Ensure these fields exist
+                    title: payload.title || 'Unknown Product',
+                    price: payload.price || 0,
+                    imageUrl: payload.imageUrl || '',
+                    description: payload.description || ''
+                };
+                state.push(newItem);
             }
         },
         deleteFromCart(state, action){

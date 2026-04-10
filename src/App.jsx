@@ -75,7 +75,8 @@ function App() {
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="light"
+          theme="colored"
+          limit={3}
         />
       </Router>
     </MyState>

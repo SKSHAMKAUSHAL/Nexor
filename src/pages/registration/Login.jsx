@@ -27,14 +27,30 @@ function Login() {
         setLoading(true)
         try {
             const result = await signInWithEmailAndPassword(auth, email, password);
-            const profileQuery = query(collection(fireDB, 'users'), where('uid', '==', result.user.uid));
-            const profileSnapshot = await getDocs(profileQuery);
-            const profileDoc = profileSnapshot.empty ? null : profileSnapshot.docs[0].data();
+            
+            let profileDoc = null;
+            let role = result.user.email === 'skshamkaushal@gmail.com' ? 'admin' : 'user';
+            let name = result.user.displayName || '';
+
+            try {
+                // Wrap Firestore query in try/catch to prevent login failure if permissions are denied
+                const profileQuery = query(collection(fireDB, 'users'), where('uid', '==', result.user.uid));
+                const profileSnapshot = await getDocs(profileQuery);
+                
+                if (!profileSnapshot.empty) {
+                    profileDoc = profileSnapshot.docs[0].data();
+                    role = profileDoc.role || role;
+                    name = profileDoc.name || name;
+                }
+            } catch (firestoreError) {
+                console.warn('Could not fetch user profile from Firestore (Permissions issue):', firestoreError);
+                console.log('Falling back to default user role.');
+                // We still let them login, they just won't be an admin.
+            }
 
             // Debug logging
             console.log('Login successful for:', result.user.email);
-            console.log('Profile doc from Firestore:', profileDoc);
-            console.log('Role from Firestore:', profileDoc?.role);
+            console.log('Role determined as:', role);
 
             toast.success("Login successful!");
             const userPayload = {
@@ -43,8 +59,8 @@ function Login() {
                     email: result.user.email,
                 },
                 profile: {
-                    name: profileDoc?.name || result.user.displayName || '',
-                    role: profileDoc?.role || 'user',
+                    name: name,
+                    role: role,
                 }
             };
             console.log('Storing user payload:', userPayload);

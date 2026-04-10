@@ -40,17 +40,26 @@ function ProductCard() {
 
     // Keep cart state serializable; strip Firestore Timestamp and unneeded fields
     const sanitizeForCart = (p) => {
+        if (!p || typeof p !== 'object') {
+            console.warn('Invalid product object:', p);
+            return null;
+        }
+        
         const safe = { ...p };
         if (safe.time && typeof safe.time === 'object') {
             try { safe.time = Date.now(); } catch { delete safe.time; }
         }
+        
         const images = getProductImages(safe);
+        const imageUrl = images && images.length > 0 ? images[0] : (isValidUrl(safe.imageUrl) ? safe.imageUrl : '');
+        
         return {
-            id: safe.id,
-            title: safe.title,
-            price: safe.price,
-            imageUrl: images[0] || (isValidUrl(safe.imageUrl) ? safe.imageUrl : ''),
-            description: safe.description,
+            id: safe.id || '',
+            title: safe.title || '',
+            price: safe.price || 0,
+            imageUrl: imageUrl,
+            description: safe.description || '',
+            category: safe.category || '',
         };
     };
 
@@ -94,6 +103,11 @@ function ProductCard() {
     const addCart = (e, product)=> {
         e.stopPropagation();
         const payload = sanitizeForCart(product);
+        if (!payload || !payload.id) {
+            toast.error('Error adding product to cart');
+            console.error('Failed to sanitize product:', product);
+            return;
+        }
         dispatch(addToCart(payload));
         toast.success('Added to cart successfully! 🛒');
     }

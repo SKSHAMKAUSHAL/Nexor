@@ -61,6 +61,11 @@ function ProductInfo() {
 
     // Sanitize product before adding to cart to avoid non-serializable values (e.g., Firestore Timestamp)
     const sanitizeForCart = (p, selectedVariation) => {
+        if (!p || typeof p !== 'object') {
+            console.warn('Invalid product object:', p);
+            return null;
+        }
+        
         const safe = { ...p };
         // Remove or convert non-serializable values
         if (safe.time && typeof safe.time === 'object') {
@@ -71,15 +76,19 @@ function ProductInfo() {
                 delete safe.time;
             }
         }
+        
+        const imageUrl = Array.isArray(safe.images) && safe.images.length && isValidUrl(safe.images[0])
+            ? safe.images[0]
+            : (isValidUrl(safe.imageUrl) ? safe.imageUrl : '');
+        
         // Keep only necessary fields to keep cart lean
         return {
-            id: safe.id,
-            title: safe.title,
-            price: safe.price,
-            imageUrl: Array.isArray(safe.images) && safe.images.length && isValidUrl(safe.images[0])
-                ? safe.images[0]
-                : (isValidUrl(safe.imageUrl) ? safe.imageUrl : ''),
-            description: safe.description,
+            id: safe.id || '',
+            title: safe.title || '',
+            price: safe.price || 0,
+            imageUrl: imageUrl,
+            description: safe.description || '',
+            category: safe.category || '',
             selectedVariation: selectedVariation || ''
         };
     };
@@ -87,13 +96,23 @@ function ProductInfo() {
     // add to cart
     const addCart = (products) => {
         const payload = sanitizeForCart(products, selectedVariation);
+        if (!payload || !payload.id) {
+            toast.error('Error adding product to cart');
+            console.error('Failed to sanitize product:', products);
+            return;
+        }
         dispatch(addToCart(payload))
-        toast.success('add to cart');
+        toast.success('Added to cart! 🛒');
     }
 
     // toggle wishlist
     const toggleWishlist = () => {
         const payload = sanitizeForCart(products, selectedVariation);
+        if (!payload || !payload.id) {
+            toast.error('Error updating wishlist');
+            return;
+        }
+        
         const isInWishlist = wishlist.some(item => item.id === products.id);
         
         if (isInWishlist) {

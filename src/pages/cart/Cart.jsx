@@ -14,34 +14,45 @@ function Cart() {
   const { mode } = context;
 
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart);
+  let cartItems = useSelector((state) => state.cart);
   const navigate = useNavigate();
+
+  // Validate cart items
+  if (!Array.isArray(cartItems)) {
+    cartItems = [];
+  }
+  
+  // Filter invalid items
+  const validCartItems = cartItems.filter(item => item && item.id && item.title && item.price !== undefined);
 
   // Check if user is logged in
   const user = JSON.parse(localStorage.getItem('user') || 'null');
 
   const deleteCart = (item) => {
+    if (!item || !item.id) return;
     dispatch(deleteFromCart(item));
     toast.success('Removed from cart', {
       position: "bottom-right",
-      autoClose: 2000,
+      autoClose: 3000,
     });
   };
 
   const handleIncreMant = (item) => {
+    if (!item || !item.id) return;
     dispatch(increMantQuantity(item));
   };
 
   const handleDecreMant = (item) => {
+    if (!item || !item.id) return;
     dispatch(decreMantQuantity(item));
   };
 
   // Memoized calculations for better performance
   const { totalAmount, totalItems } = useMemo(() => {
-    const items = cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
-    const amount = cartItems.reduce((acc, item) => acc + (parseInt(item.price) * (item.quantity || 1)), 0);
+    const items = validCartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
+    const amount = validCartItems.reduce((acc, item) => acc + (parseInt(item.price) * (item.quantity || 1)), 0);
     return { totalAmount: amount, totalItems: items };
-  }, [cartItems]);
+  }, [validCartItems]);
 
   const shipping = totalAmount > 500 ? 0 : 100;
   const discount = totalAmount > 1000 ? Math.floor(totalAmount * 0.1) : 0;
@@ -60,7 +71,7 @@ function Cart() {
     }
 
     // Check if cart is empty
-    if (cartItems.length === 0) {
+    if (validCartItems.length === 0) {
       toast.error('Your cart is empty', { position: "top-center" });
       return;
     }
@@ -82,7 +93,7 @@ function Cart() {
     };
 
     const orderInfo = {
-      cartItems,
+      cartItems: validCartItems,
       addressInfo,
       date: addressInfo.date,
       email: user?.user?.email || 'guest@example.com',
@@ -204,7 +215,7 @@ function Cart() {
             {/* Left - Cart Items */}
             <div className="lg:col-span-7 xl:col-span-8">
               <div className="space-y-4">
-                {cartItems.map((item, index) => (
+                {validCartItems.map((item, index) => (
                   <div
                     key={index}
                     className="rounded-xl border bg-white p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300"

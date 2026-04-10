@@ -52,12 +52,31 @@ function Signup() {
             }
             const userRef = collection(fireDB, "users")
             await addDoc(userRef, user);
-            toast.success("Account created successfully!");
+
+            // AUTO-LOGIN LOGIC:
+            // Store the same structure that the Login page uses
+            const userPayload = {
+                user: {
+                    uid: users.user.uid,
+                    email: users.user.email,
+                },
+                profile: {
+                    name: name,
+                    role: 'user', // Default is user
+                }
+            };
+            
+            // This is what the rest of the app looks for to consider a user "logged in"
+            localStorage.setItem('user', JSON.stringify(userPayload));
+
+            toast.success("Account created successfully! Redirecting...");
             setName("");
             setEmail("");
             setPassword("");
             setLoading(false);
-            navigate('/login')
+            
+            // Redirect to home immediately as a logged-in user
+            navigate('/');
 
         } catch (error) {
             setLoading(false);

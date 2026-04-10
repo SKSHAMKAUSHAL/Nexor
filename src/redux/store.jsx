@@ -10,9 +10,13 @@ const localStorageMiddleware = (store) => (next) => (action) => {
     if (action.type?.startsWith('cart/')) {
         const cart = store.getState().cart;
         try {
-            localStorage.setItem('cart', JSON.stringify(cart));
-        } catch {
-            // Ignore storage errors (private mode/quota).
+            // Validate cart before storing
+            if (Array.isArray(cart)) {
+                const validCart = cart.filter(item => item && item.id && item.title && item.price !== undefined);
+                localStorage.setItem('cart', JSON.stringify(validCart));
+            }
+        } catch (error) {
+            console.error('Error saving cart to localStorage:', error);
         }
     }
     
@@ -20,9 +24,13 @@ const localStorageMiddleware = (store) => (next) => (action) => {
     if (action.type?.startsWith('wishlist/')) {
         const wishlist = store.getState().wishlist;
         try {
-            localStorage.setItem('wishlist', JSON.stringify(wishlist));
-        } catch {
-            // Ignore storage errors (private mode/quota).
+            // Validate wishlist before storing
+            if (Array.isArray(wishlist)) {
+                const validWishlist = wishlist.filter(item => item && item.id);
+                localStorage.setItem('wishlist', JSON.stringify(validWishlist));
+            }
+        } catch (error) {
+            console.error('Error saving wishlist to localStorage:', error);
         }
     }
     

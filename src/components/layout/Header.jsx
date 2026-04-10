@@ -102,6 +102,9 @@ function Header() {
                 <div className="p-3 space-y-2">
                   <Link to="/order" className="block px-4 py-2 text-[#111111] text-sm hover:bg-[#F5F5F5] rounded transition-colors" onClick={() => setIsProfileMenuOpen(false)}>My Orders</Link>
                   <Link to="/wishlist" className="block px-4 py-2 text-[#111111] text-sm hover:bg-[#F5F5F5] rounded transition-colors" onClick={() => setIsProfileMenuOpen(false)}>Wishlist</Link>
+                  {user?.profile?.role === 'admin' ? (
+                    <Link to="/dashboard" className="block px-4 py-2 text-[#111111] text-sm hover:bg-[#F5F5F5] font-bold rounded transition-colors" onClick={() => setIsProfileMenuOpen(false)}>Admin Dashboard</Link>
+                  ) : null}
                   <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-[#111111] text-sm hover:bg-[#F5F5F5] rounded transition-colors flex items-center gap-2">
                     <FiLogOut className="text-sm" />
                     Sign Out
@@ -125,6 +128,9 @@ function Header() {
 
           <div className="mt-8 flex flex-col gap-4 text-lg font-medium text-gray-500">
             <Link to="/order" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
+            {user?.profile?.role === 'admin' ? (
+              <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-[#111111] font-bold">Admin Dashboard</Link>
+            ) : null}
             {isLoggedIn ? (
               <button
                 onClick={() => {

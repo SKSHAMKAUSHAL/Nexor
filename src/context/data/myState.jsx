@@ -74,7 +74,7 @@ function MyState(props) {
       await addDoc(productRef, products)
       toast.success('Product added successfully! 🎉', {
         position: 'top-center',
-        autoClose: 2000,
+        autoClose: 3000,
       })
 
       setLoading(false)
