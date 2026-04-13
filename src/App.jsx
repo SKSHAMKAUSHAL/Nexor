@@ -5,7 +5,6 @@ import {
   Navigate,
 } from 'react-router-dom';
 import PropTypes from 'prop-types';
-
 import Home from './pages/home/Home';
 import Order from './pages/order/Order';
 import Cart from './pages/cart/Cart';
@@ -21,7 +20,6 @@ import Wishlist from './pages/wishlist/Wishlist';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Allproducts from './pages/allproducts/Allproducts';
-
 const getStoredUser = () => {
   try {
     const raw = localStorage.getItem('user');
@@ -30,7 +28,6 @@ const getStoredUser = () => {
     return null;
   }
 };
-
 function App() {
   return (
     <MyState>
@@ -82,9 +79,7 @@ function App() {
     </MyState>
   );
 }
-
 export default App;
-
 // Protected Route for authenticated users
 export const ProtectedRoute = ({ children }) => {
   const user = getStoredUser();
@@ -94,29 +89,19 @@ export const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" />;
   }
 };
-
 // Protected Route for admin users
 const ProtectedRouteForAdmin = ({ children }) => {
   const admin = getStoredUser();
   const isAdmin = admin?.profile?.role === 'admin';
-
-  // Debug logging
-  console.log('ProtectedRouteForAdmin - Stored user:', admin);
-  console.log('ProtectedRouteForAdmin - Role:', admin?.profile?.role);
-  console.log('ProtectedRouteForAdmin - Is Admin:', isAdmin);
-
   if (!admin?.user?.uid || !isAdmin) {
     console.warn('Admin access denied - Redirecting to login');
     return <Navigate to="/login" />;
   }
-
   return children;
 };
-
 ProtectedRoute.propTypes = {
   children: PropTypes.node.isRequired,
 };
-
 ProtectedRouteForAdmin.propTypes = {
   children: PropTypes.node.isRequired,
 };

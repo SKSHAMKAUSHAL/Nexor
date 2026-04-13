@@ -15,13 +15,16 @@ export default function Modal({ name, address, pincode, phoneNumber, setName, se
 
     return (
         <>
-            <div className="  text-center rounded-lg text-white font-bold">
+            <div className="w-full mt-6 relative">
                 <button
                     type="button"
                     onClick={openModal}
-                    className="w-full  bg-violet-600 py-2 text-center rounded-lg text-white font-bold "
+                    className="w-full flex items-center justify-center gap-3 bg-black text-white border-2 border-black py-4 rounded-full text-xl font-black uppercase tracking-widest transition-all animate-pulse hover:animate-none hover:bg-white hover:text-black hover:shadow-xl active:scale-95"
                 >
-                    Buy Now
+                    BUY NOW
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                    </svg>
                 </button>
             </div>
 
@@ -77,7 +80,14 @@ export default function Modal({ name, address, pincode, phoneNumber, setName, se
                                                         </div>
 
                                                     </form>
-                                                    <button onClick={()=>{buyNow(); closeModal()}} type="button" className="focus:outline-none w-full text-white bg-violet-600 hover:bg-violet-800  outline-0 font-medium rounded-lg text-sm px-5 py-2.5 ">Order Now</button>
+                                                    <div className="pt-2 relative">
+                                                        <button onClick={()=>{buyNow(); closeModal()}} type="button" className="focus:outline-none flex justify-center items-center gap-3 w-full bg-black text-white border-2 border-black font-black uppercase tracking-widest rounded-full text-lg px-5 py-4 transition-all animate-pulse hover:animate-none hover:bg-white hover:text-black hover:shadow-xl active:scale-95">
+                                                            ORDER NOW
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
 
                                                 </div>
                                             </div>

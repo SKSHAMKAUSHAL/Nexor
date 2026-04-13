@@ -44,13 +44,13 @@ function Login() {
                 }
             } catch (firestoreError) {
                 console.warn('Could not fetch user profile from Firestore (Permissions issue):', firestoreError);
-                console.log('Falling back to default user role.');
+
                 // We still let them login, they just won't be an admin.
             }
 
             // Debug logging
-            console.log('Login successful for:', result.user.email);
-            console.log('Role determined as:', role);
+
+
 
             toast.success("Login successful!");
             const userPayload = {
@@ -63,7 +63,7 @@ function Login() {
                     role: role,
                 }
             };
-            console.log('Storing user payload:', userPayload);
+
             localStorage.setItem('user', JSON.stringify(userPayload));
             navigate('/')
             setLoading(false)

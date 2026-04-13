@@ -2,6 +2,7 @@ import { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiUser, FiLogOut } from 'react-icons/fi';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 import myContext from '../../context/data/myContext';
 
 function Header() {
@@ -12,6 +13,9 @@ function Header() {
   const navigate = useNavigate();
   const context = useContext(myContext);
   const { searchkey, setSearchkey, setFilterType, product } = context;
+
+  const cartItems = useSelector((state) => state.cart) || [];
+  const cartItemCount = cartItems.reduce((total, item) => total + (item.quantity || 1), 0);
 
   let user = null;
   try {
@@ -80,8 +84,13 @@ function Header() {
             <FiHeart className="text-2xl text-[#111111]" />
           </button>
 
-          <button className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors" onClick={() => navigate('/cart')}>
+          <button className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors relative" onClick={() => navigate('/cart')}>
             <FiShoppingBag className="text-2xl text-[#111111]" />
+            {cartItemCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 bg-[#111111] text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
+                {cartItemCount > 9 ? '9+' : cartItemCount}
+              </span>
+            )}
           </button>
 
           <div className="relative">

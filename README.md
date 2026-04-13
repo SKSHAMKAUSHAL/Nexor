@@ -9,7 +9,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.3.3-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Redux](https://img.shields.io/badge/Redux-2.2.7-764ABC?style=for-the-badge&logo=redux&logoColor=white)](https://redux-toolkit.js.org/)
 
-[Live Demo](https://shop-with-shopup.netlify.app/) • [Report Bug](https://github.com/SKSHAMKAUSHAL/E_SHOP_UP/issues) • [Request Feature](https://github.com/SKSHAMKAUSHAL/E_SHOP_UP/issues)
+[Live Demo](https://shop-with-shopup.netlify.app/) • [Report Bug](https://github.com/SKSHAMKAUSHAL/Nexor/issues) • [Request Feature](https://github.com/SKSHAMKAUSHAL/Nexor/issues)
 
 </div>
 
@@ -31,10 +31,10 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/SKSHAMKAUSHAL/E_SHOP_UP.git
+git clone https://github.com/SKSHAMKAUSHAL/Nexor.git
 
 # Navigate to directory
-cd E_SHOP_UP
+cd Nexor
 
 # Install dependencies
 npm install
@@ -75,7 +75,7 @@ src/
 ├── pages/             # Page components & routes
 ├── context/           # Global state manageMant
 ├── redux/             # Redux store & slices
-├── fireabase/         # Firebase configuration
+├── firebase/          # Firebase configuration
 └── utils/             # Helper functions
 ```
 

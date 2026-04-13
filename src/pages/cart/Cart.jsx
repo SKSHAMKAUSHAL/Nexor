@@ -1,149 +1,135 @@
-import { useContext, useEffect, useState, useMemo } from 'react';
+import { useContext, useState, useMemo } from 'react';
 import myContext from '../../context/data/myContext';
 import Layout from '../../components/layout/Layout';
 import Modal from '../../components/modal/Modal';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteFromCart, increMantQuantity, decreMantQuantity, clearCart } from '../../redux/cartSlice';
+import {
+  deleteFromCart,
+  increMantQuantity,
+  decreMantQuantity,
+  clearCart
+} from '../../redux/cartSlice';
 import { toast } from 'react-toastify';
 import { addDoc, collection } from 'firebase/firestore';
 import { fireDB } from '../../firebase/FirebaseConfig';
 import { Link, useNavigate } from 'react-router-dom';
+import { processPayment } from '../../utils/razorpay';
 
 function Cart() {
-  const context = useContext(myContext);
-  const { mode } = context;
-
+  const { mode } = useContext(myContext);
   const dispatch = useDispatch();
-  let cartItems = useSelector((state) => state.cart);
   const navigate = useNavigate();
 
-  // Validate cart items
-  if (!Array.isArray(cartItems)) {
-    cartItems = [];
-  }
-  
-  // Filter invalid items
-  const validCartItems = cartItems.filter(item => item && item.id && item.title && item.price !== undefined);
+  let cartItems = useSelector((state) => state.cart) || [];
 
-  // Check if user is logged in
+  // Filter valid items
+  const validCartItems = cartItems.filter(
+    (item) => item && item.id && item.title && item.price !== undefined
+  );
+
   const user = JSON.parse(localStorage.getItem('user') || 'null');
 
-  const deleteCart = (item) => {
-    if (!item || !item.id) return;
+  // ✅ Quantity handlers
+  const handleDelete = (item) => {
     dispatch(deleteFromCart(item));
-    toast.success('Removed from cart', {
-      position: "bottom-right",
-      autoClose: 3000,
-    });
+    toast.success('Removed from cart');
   };
 
-  const handleIncreMant = (item) => {
-    if (!item || !item.id) return;
+  const handleIncrease = (item) => {
     dispatch(increMantQuantity(item));
   };
 
-  const handleDecreMant = (item) => {
-    if (!item || !item.id) return;
+  const handleDecrease = (item) => {
     dispatch(decreMantQuantity(item));
   };
 
-  // Memoized calculations for better performance
+  // ✅ Calculations
   const { totalAmount, totalItems } = useMemo(() => {
-    const items = validCartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
-    const amount = validCartItems.reduce((acc, item) => acc + (parseInt(item.price) * (item.quantity || 1)), 0);
+    const items = validCartItems.reduce(
+      (acc, item) => acc + (item.quantity || 1),
+      0
+    );
+
+    const amount = validCartItems.reduce(
+      (acc, item) =>
+        acc + Number(item.price) * (item.quantity || 1),
+      0
+    );
+
     return { totalAmount: amount, totalItems: items };
   }, [validCartItems]);
 
   const shipping = totalAmount > 500 ? 0 : 100;
-  const discount = totalAmount > 1000 ? Math.floor(totalAmount * 0.1) : 0;
+  const discount = totalAmount > 1000 ? totalAmount * 0.1 : 0;
   const grandTotal = totalAmount + shipping - discount;
 
+  // ✅ Form state
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [pincode, setPincode] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [loading, setLoading] = useState(false);
 
+  // ✅ Buy Now
   const buyNow = async () => {
     if (!user) {
-      toast.error('Please login to checkout', { position: "top-center" });
+      toast.error('Please login');
       navigate('/login');
       return;
     }
 
-    // Check if cart is empty
     if (validCartItems.length === 0) {
-      toast.error('Your cart is empty', { position: "top-center" });
+      toast.error('Cart is empty');
       return;
     }
 
+    // ✅ Validation
     if (!name || !address || !pincode || !phoneNumber) {
-      return toast.error('All fields are required', { position: "top-center" });
+      return toast.error('All fields required');
     }
 
-    const addressInfo = {
-      name,
-      address,
-      pincode,
-      phoneNumber,
-      date: new Date().toLocaleString('en-US', {
-        month: 'short',
-        day: '2-digit',
-        year: 'numeric',
-      }),
-    };
+    if (!/^\d{10}$/.test(phoneNumber)) {
+      return toast.error('Invalid phone number');
+    }
+
+    if (!/^\d{6}$/.test(pincode)) {
+      return toast.error('Invalid pincode');
+    }
+
+    setLoading(true);
 
     const orderInfo = {
       cartItems: validCartItems,
-      addressInfo,
-      date: addressInfo.date,
-      email: user?.user?.email || 'guest@example.com',
+      addressInfo: { name, address, pincode, phoneNumber },
+      email: user?.user?.email || 'guest',
       userid: user?.user?.uid || 'guest',
+      date: new Date().toLocaleString()
     };
 
-    try {
-      if (!window.Razorpay) {
-        toast.error('PayMant service unavailable. Please refresh and try again.');
-        return;
-      }
-
-      const options = {
-        key: 'rzp_test_1DP5mmOlF5G5ag',
-        amount: grandTotal * 100,
-        currency: 'INR',
-        name: 'SHOP UP',
-        description: 'Test Transaction',
-        handler: async function (response) {
-          toast.success('PayMant Successful');
-
-          const payMantId = response.razorpay_payMant_id;
-          await addDoc(collection(fireDB, 'orders'), { ...orderInfo, payMantId });
-          dispatch(clearCart());
-        },
-        theme: {
-          color: '#111111',
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (err) {
-      toast.error('Something went wrong');
-    }
+    // ✅ Execute external payment processor
+    await processPayment({
+      grandTotal,
+      orderInfo,
+      user,
+      name,
+      phoneNumber,
+      dispatch,
+      clearCart,
+      toast,
+      navigate,
+      setLoading
+    });
   };
 
-  // We don't want to redirect entirely for Cart page anymore
-  // Users should be able to see their cart as guests
-  // if (!user) { return null; }
-
-  // Empty cart state
-  if (cartItems.length === 0) {
+  // ✅ Empty cart UI
+  if (validCartItems.length === 0) {
     return (
       <Layout>
         <div
           className="min-h-screen flex flex-col items-center justify-center"
           style={{
             backgroundColor: mode === 'dark' ? '#282c34' : '#f9fafb',
-            color: mode === 'dark' ? 'white' : '',
+            color: mode === 'dark' ? 'white' : 'black',
           }}
         >
           <div className="text-center">
@@ -153,7 +139,6 @@ function Cart() {
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -163,15 +148,11 @@ function Cart() {
                 />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold mb-4">Your Cart is Empty</h2>
+            <h2 className="text-3xl font-bold mb-4 uppercase tracking-wider">Your Cart is Empty</h2>
             <p className="text-gray-500 mb-8">Looks like you haven&apos;t added anything to your cart yet.</p>
             <Link to="/allproducts">
               <button 
-                className="shadow-lg hover:shadow-2xl font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
-                style={{
-                  backgroundColor: mode === 'dark' ? 'white' : 'black',
-                  color: mode === 'dark' ? 'black' : 'white',
-                }}
+                className="font-bold uppercase tracking-widest py-4 px-10 rounded-full transition-all border-2 border-black bg-black text-white hover:bg-white hover:text-black dark:border-white dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white"
               >
                 Start Shopping
               </button>
@@ -195,8 +176,8 @@ function Cart() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">Shopping Cart</h1>
-              <p className="text-sm sm:text-base text-gray-500 mt-1">{totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart</p>
+              <h1 className="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight">Shopping Cart</h1>
+              <p className="text-sm sm:text-base text-gray-500 mt-1 font-medium">{totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart</p>
             </div>
             <button
               onClick={() => {
@@ -205,123 +186,71 @@ function Cart() {
                   toast.info('Cart cleared');
                 }
               }}
-              className="text-sm text-red-600 hover:text-red-700 font-medium transition-colors self-start sm:self-auto"
+              className="text-sm font-bold uppercase tracking-widest text-gray-500 hover:text-black dark:hover:text-white transition-colors self-start sm:self-auto border-b-2 border-transparent hover:border-black dark:hover:border-white pb-1"
             >
               Clear Cart
             </button>
           </div>
 
-          <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-x-8 gap-y-6">
+          <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-x-12 gap-y-8">
             {/* Left - Cart Items */}
             <div className="lg:col-span-7 xl:col-span-8">
-              <div className="space-y-4">
-                {validCartItems.map((item, index) => (
+              <div className="space-y-6">
+                {validCartItems.map((item) => (
                   <div
-                    key={index}
-                    className="rounded-xl border bg-white p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300"
-                    style={{
-                      backgroundColor: mode === 'dark' ? '#202123' : '',
-                      color: mode === 'dark' ? 'white' : '',
-                      borderColor: mode === 'dark' ? '#374151' : '',
-                    }}
+                    key={item.id}
+                    className="flex flex-col sm:flex-row gap-6 border-b pb-6"
+                    style={{ borderColor: mode === 'dark' ? '#374151' : '#e5e7eb' }}
                   >
-                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                      {/* Image */}
-                      <div className="flex-shrink-0 mx-auto sm:mx-0">
-                        <img
-                          src={item.imageUrl || 'https://via.placeholder.com/128?text=No+Image'}
-                          alt={item.title}
-                          className="h-24 w-24 sm:h-32 sm:w-32 rounded-lg object-cover"
-                          onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/128?text=No+Image'; }}
-                        />
+                    {/* Image */}
+                    <div className="flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden h-32 w-32 sm:h-40 sm:w-40 relative">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title}
+                        className="w-full h-full object-cover mix-blend-multiply"
+                        onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/150?text=No+Image'; }}
+                      />
+                    </div>
+
+                    {/* Details */}
+                    <div className="flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex justify-between">
+                          <h2 className="text-lg sm:text-xl font-bold uppercase tracking-tight pr-4">{item.title}</h2>
+                          <p className="text-lg font-bold">₹{parseInt(item.price) * (item.quantity || 1)}</p>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1 capitalize font-medium">{item.category}</p>
                       </div>
 
-                      {/* Details */}
-                      <div className="flex-1 flex flex-col justify-between">
-                        <div>
-                          <div className="flex justify-between gap-2">
-              <div className="flex flex-col">
-                <h2 className="text-base sm:text-lg font-semibold mb-2 pr-2">{item.title}</h2>
-                {item.selectedVariation && (
-                  <span className="text-xs px-2 py-0.5 rounded-full mt-1 font-medium" style={{ backgroundColor: mode === 'dark' ? 'rgba(236,72,153,0.12)' : 'rgba(236,72,153,0.08)', color: mode === 'dark' ? '#e5e7eb' : '#374151' }}>
-                    {item.selectedVariation}
-                  </span>
-                )}
-              </div>
-                            <button
-                              onClick={() => deleteCart(item)}
-                              className="text-gray-400 hover:text-red-500 transition-colors p-2 flex-shrink-0"
-                              aria-label="Remove item"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={2}
-                                stroke="currentColor"
-                                className="w-5 h-5"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                          <p className="text-xs sm:text-sm text-gray-500 line-clamp-2 mb-3">{item.description}</p>
+                      {/* Quantity & Actions */}
+                      <div className="flex items-center justify-between mt-4 sm:mt-0">
+                        <div className="flex items-center border-2 rounded-full px-2 py-1" style={{ borderColor: mode === 'dark' ? '#4b5563' : '#000' }}>
+                          <button
+                            onClick={() => handleDecrease(item)}
+                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors font-bold text-lg outline-none"
+                          >
+                            −
+                          </button>
+                          <span className="w-12 text-center font-bold text-lg select-none">
+                            {item.quantity || 1}
+                          </span>
+                          <button
+                            onClick={() => handleIncrease(item)}
+                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors font-bold text-lg outline-none"
+                          >
+                            +
+                          </button>
                         </div>
 
-                        {/* Price and Quantity */}
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-                          <div className="flex items-center space-x-4 w-full sm:w-auto">
-                            {/* Quantity Controls */}
-                            <div className="flex items-center border rounded-lg" style={{ borderColor: mode === 'dark' ? '#374151' : '#e5e7eb' }}>
-                              <button
-                                onClick={() => handleDecreMant(item)}
-                                className="px-2 sm:px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded-l-lg touch-manipulation"
-                                disabled={(item.quantity || 1) <= 1}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={2}
-                                  stroke="currentColor"
-                                  className="w-4 h-4"
-                                >
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
-                                </svg>
-                              </button>
-                              <span className="px-3 sm:px-4 py-2 font-medium min-w-[2.5rem] sm:min-w-[3rem] text-center text-sm sm:text-base">
-                                {item.quantity || 1}
-                              </span>
-                              <button
-                                onClick={() => handleIncreMant(item)}
-                                className="px-2 sm:px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded-r-lg touch-manipulation"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={2}
-                                  stroke="currentColor"
-                                  className="w-4 h-4"
-                                >
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Price */}
-                          <div className="text-right sm:text-right w-full sm:w-auto">
-                            <p className="text-lg sm:text-xl font-bold text-pink-600">
-                              ₹{parseInt(item.price) * (item.quantity || 1)}
-                            </p>
-                            <p className="text-xs text-gray-500">₹{item.price} each</p>
-                          </div>
-                        </div>
+                        <button
+                          onClick={() => handleDelete(item)}
+                          className="text-gray-400 hover:text-red-500 transition-colors"
+                          aria-label="Remove item"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                          </svg>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -330,16 +259,9 @@ function Cart() {
 
               {/* Continue Shopping */}
               <Link to="/allproducts">
-                <button className="mt-6 w-full sm:w-auto flex items-center justify-center gap-2 text-pink-600 hover:text-pink-700 font-medium transition-colors">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                <button className="mt-8 mb-4 w-full sm:w-auto flex items-center justify-center gap-2 font-bold uppercase tracking-widest text-sm border-2 border-black dark:border-white px-8 py-4 rounded-full transition-all hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
                   </svg>
                   Continue Shopping
                 </button>
@@ -347,113 +269,85 @@ function Cart() {
             </div>
 
             {/* Right - Order Summary */}
-            <div className="lg:col-span-5 xl:col-span-4 mt-6 lg:mt-0">
+            <div className="lg:col-span-5 xl:col-span-4 mt-8 lg:mt-0">
               <div
-                className="rounded-xl border bg-white p-4 sm:p-6 shadow-sm lg:sticky lg:top-24"
+                className="p-6 sm:p-8 rounded-2xl lg:sticky lg:top-24"
                 style={{
-                  backgroundColor: mode === 'dark' ? '#202123' : '',
-                  color: mode === 'dark' ? 'white' : '',
-                  borderColor: mode === 'dark' ? '#374151' : '',
+                  backgroundColor: mode === 'dark' ? '#202123' : '#ffffff',
+                  color: mode === 'dark' ? 'white' : 'black',
+                  boxShadow: mode === 'dark' ? 'none' : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                 }}
               >
-                <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">Order Summary</h2>
+                <h2 className="text-2xl font-black uppercase tracking-wide mb-6">Summary</h2>
 
                 <div className="space-y-4 mb-6">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600" style={{ color: mode === 'dark' ? '#9ca3af' : '' }}>
-                      Subtotal ({totalItems} items)
-                    </span>
-                    <span className="font-medium">₹{totalAmount}</span>
+                  <div className="flex justify-between text-base font-medium">
+                    <span className="text-gray-500">Subtotal</span>
+                    <span>₹{totalAmount}</span>
                   </div>
 
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600" style={{ color: mode === 'dark' ? '#9ca3af' : '' }}>
-                      Shipping
-                    </span>
-                    <span className="font-medium">
-                      {shipping === 0 ? (
-                        <span className="text-green-600">FREE</span>
-                      ) : (
-                        `₹${shipping}`
-                      )}
-                    </span>
+                  <div className="flex justify-between text-base font-medium">
+                    <span className="text-gray-500">Estimated Delivery</span>
+                    <span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
                   </div>
 
                   {discount > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600" style={{ color: mode === 'dark' ? '#9ca3af' : '' }}>
-                        Discount (10%)
-                      </span>
-                      <span className="font-medium text-green-600">-₹{discount}</span>
+                    <div className="flex justify-between text-base font-medium">
+                      <span className="text-gray-500">Discount (10%)</span>
+                      <span className="text-green-600">-₹{discount}</span>
                     </div>
                   )}
-
+                  
+                  {/* Delivery Promos */}
                   {totalAmount < 500 && (
-                    <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                      <p className="text-xs text-blue-700 dark:text-blue-300">
+                    <div className="border-l-4 border-black dark:border-white bg-gray-100 dark:bg-gray-800 p-4 mt-6 rounded-r-lg">
+                      <p className="text-sm font-bold text-black dark:text-white tracking-wide">
                         Add ₹{500 - totalAmount} more to get FREE shipping! 🚚
                       </p>
                     </div>
                   )}
 
                   {totalAmount >= 500 && totalAmount < 1000 && (
-                    <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
-                      <p className="text-xs text-green-700 dark:text-green-300">
+                    <div className="border-l-4 border-black dark:border-white bg-gray-100 dark:bg-gray-800 p-4 mt-6 rounded-r-lg">
+                      <p className="text-sm font-bold text-black dark:text-white tracking-wide">
                         Add ₹{1000 - totalAmount} more to get 10% discount! 🎉
                       </p>
                     </div>
                   )}
                 </div>
 
-                <div className="border-t pt-4 mb-6" style={{ borderColor: mode === 'dark' ? '#374151' : '' }}>
-                  <div className="flex justify-between text-lg font-bold">
-                    <span>Total</span>
-                    <span className="text-pink-600">₹{grandTotal}</span>
+                <div className="border-t-2 border-b-2 py-4 mb-8" style={{ borderColor: mode === 'dark' ? '#374151' : '#e5e7eb' }}>
+                  <div className="flex justify-between items-center text-xl">
+                    <span className="font-bold uppercase tracking-wider">Total</span>
+                    <span className="font-black">₹{grandTotal}</span>
                   </div>
                 </div>
 
-                {/* Only show Buy Now button when cart has items */}
-                {cartItems.length > 0 && (
-                  user ? (
-                    <Modal
-                      name={name}
-                      address={address}
-                      pincode={pincode}
-                      phoneNumber={phoneNumber}
-                      setName={setName}
-                      setAddress={setAddress}
-                      setPincode={setPincode}
-                      setPhoneNumber={setPhoneNumber}
-                      buyNow={buyNow}
-                    />
-                  ) : (
-                    <button
-                      onClick={() => {
-                        toast.error('Please login to checkout', { position: 'top-center' });
-                        navigate('/login');
-                      }}
-                      className="w-full bg-violet-600 py-2 text-center rounded-lg text-white font-bold"
-                    >
-                      Buy Now
-                    </button>
-                  )
+                {/* Checkout Buttons */}
+                {user ? (
+                  <Modal
+                    name={name}
+                    address={address}
+                    pincode={pincode}
+                    phoneNumber={phoneNumber}
+                    setName={setName}
+                    setAddress={setAddress}
+                    setPincode={setPincode}
+                    setPhoneNumber={setPhoneNumber}
+                    buyNow={buyNow}
+                    loading={loading}
+                  />
+                ) : (
+                  <button
+                    onClick={() => {
+                      toast.error('Please login to checkout', { position: 'top-center' });
+                      navigate('/login');
+                    }}
+                    className="w-full flex items-center justify-center gap-3 bg-black text-white border-2 border-black py-4 rounded-full text-xl font-black uppercase tracking-widest transition-all animate-pulse hover:animate-none hover:bg-white hover:text-black hover:shadow-xl active:scale-95"
+                  >
+                    Guest Checkout
+                  </button>
                 )}
-
-                {/* Trust Badges */}
-                <div className="mt-6 space-y-3">
-                  <div className="flex items-center gap-3 text-sm text-gray-600" style={{ color: mode === 'dark' ? '#9ca3af' : '' }}>
-                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Secure Checkout</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-gray-600" style={{ color: mode === 'dark' ? '#9ca3af' : '' }}>
-                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Easy Returns</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -463,4 +357,4 @@ function Cart() {
   );
 }
 
-export default Cart;
+export default Cart; 
