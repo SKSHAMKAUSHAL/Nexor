@@ -311,7 +311,7 @@ function MyState(props) {
     <MyContext.Provider value={{
       mode, toggleMode, loading, setLoading,
       products, setProducts, addProduct, product,
-      edithandle, updateProduct, deleteProduct, order, deleteOrder, getOrderData,
+        edithandle, updateProduct, deleteProduct, order, deleteOrder, getOrderData, getUserData,
       user, searchkey, setSearchkey, filterType, setFilterType,
       filterPrice, setFilterPrice, filterSize, setFilterSize, filterColor, setFilterColor,
       wishlist, getWishlistData, addToWishlistBackend, removeFromWishlistBackend

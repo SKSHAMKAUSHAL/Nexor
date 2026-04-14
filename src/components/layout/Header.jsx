@@ -105,8 +105,8 @@ function Header() {
 
             {isLoggedIn && isProfileMenuOpen && (
               <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                <div className="p-4 border-b border-gray-100">
-                  <p className="text-[#111111] font-medium text-sm">{user?.user?.email || 'My Account'}</p>
+                  <div className="p-4 border-b border-gray-100 overflow-hidden">
+                    <p className="text-[#111111] font-medium text-sm truncate" title={user?.user?.email}>{user?.user?.email || 'My Account'}</p>
                 </div>
                 <div className="p-3 space-y-2">
                   <Link to="/order" className="block px-4 py-2 text-[#111111] text-sm hover:bg-[#F5F5F5] rounded transition-colors" onClick={() => setIsProfileMenuOpen(false)}>My Orders</Link>

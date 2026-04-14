@@ -29,28 +29,34 @@ function Login() {
             const result = await signInWithEmailAndPassword(auth, email, password);
             
             let profileDoc = null;
-            let role = result.user.email === 'skshamkaushal@gmail.com' ? 'admin' : 'user';
+            let role = 'user'; // Default role
             let name = result.user.displayName || '';
 
             try {
-                // Wrap Firestore query in try/catch to prevent login failure if permissions are denied
+                // Query by UID because Firestore security rules usually allow users to read their own document by ID
                 const profileQuery = query(collection(fireDB, 'users'), where('uid', '==', result.user.uid));
                 const profileSnapshot = await getDocs(profileQuery);
-                
+
                 if (!profileSnapshot.empty) {
                     profileDoc = profileSnapshot.docs[0].data();
-                    role = profileDoc.role || role;
+                    role = profileDoc.role?.trim() || 'user';
                     name = profileDoc.name || name;
+                } else {
+                    // Fallback to email query if UID changed (e.g. user was recreated in Firebase Auth manually)
+                    const emailQuery = query(collection(fireDB, 'users'), where('email', '==', result.user.email));
+                    const emailSnapshot = await getDocs(emailQuery);
+                    
+                    if (!emailSnapshot.empty) {
+                        let adminDoc = emailSnapshot.docs.find(d => d.data().role?.trim() === 'admin');
+                        profileDoc = adminDoc ? adminDoc.data() : emailSnapshot.docs[0].data();
+                        role = profileDoc.role?.trim() || 'user';
+                        name = profileDoc.name || name;
+                    }
                 }
             } catch (firestoreError) {
-                console.warn('Could not fetch user profile from Firestore (Permissions issue):', firestoreError);
-
-                // We still let them login, they just won't be an admin.
+                console.error('Firestore Error:', firestoreError);
+                toast.error("Warning: Could not fetch your admin role due to Firebase Permissions.");
             }
-
-            // Debug logging
-
-
 
             toast.success("Login successful!");
             const userPayload = {

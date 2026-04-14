@@ -1,4 +1,4 @@
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useEffect } from 'react';
 import { FaUserTie, FaShoppingBag, FaBoxOpen } from 'react-icons/fa';
 import { MdAttachMoney } from 'react-icons/md';
 import myContext from '../../../context/data/myContext';
@@ -7,7 +7,13 @@ import DashboardTab from './DashboardTab';
 
 function Dashboard() {
   const context = useContext(myContext);
-  const { mode, product, order, user } = context;
+  const { mode, product, order, user, getOrderData, getUserData } = context;
+
+  // Always fetch latest data when admin visits dashboard
+  useEffect(() => {
+    getOrderData();
+    getUserData();
+  }, []);
 
   // Calculate total revenue with useMemo for optimization
   const totalRevenue = useMemo(() => {
