@@ -5,7 +5,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, fireDB } from '../../firebase/FirebaseConfig';
 import { toast } from 'react-toastify';
 import Loader from '../../components/loader/Loader';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
 
 function Login() {
     const context = useContext(myContext)
@@ -33,25 +33,16 @@ function Login() {
             let name = result.user.displayName || '';
 
             try {
-                // Query by UID because Firestore security rules usually allow users to read their own document by ID
-                const profileQuery = query(collection(fireDB, 'users'), where('uid', '==', result.user.uid));
-                const profileSnapshot = await getDocs(profileQuery);
+                // Fetch directly by document ID (which matches the Auth UID now)
+                const userDocRef = doc(fireDB, 'users', result.user.uid);
+                const userDocSnap = await getDoc(userDocRef);
 
-                if (!profileSnapshot.empty) {
-                    profileDoc = profileSnapshot.docs[0].data();
+                if (userDocSnap.exists()) {
+                    profileDoc = userDocSnap.data();
                     role = profileDoc.role?.trim() || 'user';
                     name = profileDoc.name || name;
                 } else {
-                    // Fallback to email query if UID changed (e.g. user was recreated in Firebase Auth manually)
-                    const emailQuery = query(collection(fireDB, 'users'), where('email', '==', result.user.email));
-                    const emailSnapshot = await getDocs(emailQuery);
-                    
-                    if (!emailSnapshot.empty) {
-                        let adminDoc = emailSnapshot.docs.find(d => d.data().role?.trim() === 'admin');
-                        profileDoc = adminDoc ? adminDoc.data() : emailSnapshot.docs[0].data();
-                        role = profileDoc.role?.trim() || 'user';
-                        name = profileDoc.name || name;
-                    }
+                    role = 'user';
                 }
             } catch (firestoreError) {
                 console.error('Firestore Error:', firestoreError);

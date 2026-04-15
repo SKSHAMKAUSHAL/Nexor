@@ -4,7 +4,7 @@ import myContext from '../../context/data/myContext';
 import { toast } from 'react-toastify';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, fireDB } from '../../firebase/FirebaseConfig';
-import { Timestamp, addDoc, collection } from 'firebase/firestore';
+import { Timestamp, addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import Loader from '../../components/loader/Loader';
 
 function Signup() {
@@ -42,7 +42,7 @@ function Signup() {
                 name: name,
                 uid: users.user.uid,
                 email: users.user.email,
-                role: 'user',
+                role: 'user', // Default is user. Promote to admin manually in Firebase Console.
                 date: new Date().toLocaleString('en-US', {
                     month: 'short',
                     day: '2-digit',
@@ -51,7 +51,7 @@ function Signup() {
                 time: Timestamp.now()
             }
             const userRef = collection(fireDB, "users")
-            await addDoc(userRef, user);
+            await setDoc(doc(fireDB, "users", users.user.uid), user);
 
             // AUTO-LOGIN LOGIC:
             // Store the same structure that the Login page uses

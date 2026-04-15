@@ -32,8 +32,15 @@ export const processPayment = async ({
   }
 
   try {
+    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY;
+    if (!razorpayKey) {
+      toast.error('Payment configuration missing. Please contact support.');
+      setLoading(false);
+      return;
+    }
+
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY || 'rzp_test_1DP5mmOlF5G5ag', // Fallback to hardcoded test key if env is missing
+      key: razorpayKey,
       amount: Math.floor(grandTotal * 100),
       currency: 'INR',
       name: 'ShopUp / Nexor', // Updated to match store identity
