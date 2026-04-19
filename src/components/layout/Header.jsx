@@ -66,7 +66,7 @@ function Header() {
     <header className="w-full bg-white z-50 sticky top-0 font-sans">
       <div className="h-[60px] flex items-center justify-between px-6 lg:px-10 border-b border-[#E5E5E5] bg-white">
         <Link to="/" className="flex-shrink-0 hover:opacity-70 transition-opacity">
-          <img src="/logo.png" alt="ShopUp Logo" className="h-10 w-auto object-contain" />
+          <img src="/logo.png" alt="Nexor Fit Logo" className="h-10 w-auto object-contain" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-7 font-bold text-[15px] tracking-wide text-[#111111]">

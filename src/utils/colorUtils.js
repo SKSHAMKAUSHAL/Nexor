@@ -1,5 +1,5 @@
 /**
- * SHOP UP - Modern Color Utility System
+ * NEXOR FIT - Modern Color Utility System
  * Centralized color manageMant for light and dark modes
  */
 

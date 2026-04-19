@@ -19,7 +19,7 @@ export default {
           darkGray: '#707072',
           lightGray: '#E5E5E5'
         },
-        // SHOP UP Modern Color Scheme
+        // NEXOR FIT Modern Color Scheme
         // Light Mode Colors
         light: {
           primary: {

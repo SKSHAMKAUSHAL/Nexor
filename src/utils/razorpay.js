@@ -43,7 +43,7 @@ export const processPayment = async ({
       key: razorpayKey,
       amount: Math.floor(grandTotal * 100),
       currency: 'INR',
-      name: 'ShopUp / Nexor', // Updated to match store identity
+      name: 'Nexor Fit', // Updated to match store identity
       description: 'Secure Payment',
       handler: async (response) => {
         try {

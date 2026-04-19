@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛍️ ShopUp
+# 🛍️ Nexor Fit
 
 ### Modern E-Commerce Platform
 

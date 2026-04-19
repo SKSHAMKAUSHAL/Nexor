@@ -120,7 +120,7 @@ const Logo = ({
       {showText && (
         <div className="flex flex-col leading-none">
           <span className={`font-bold ${currentSize.text} ${colors.text} tracking-tight`}>
-            ShopUp
+            Nexor Fit
           </span>
           {size !== 'small' && (
             <span className="text-xs text-gray-500 font-medium tracking-wider">
