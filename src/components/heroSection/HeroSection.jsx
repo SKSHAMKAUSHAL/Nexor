@@ -1,8 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { FaPlay } from 'react-icons/fa';
+import { useContext } from 'react';
+import myContext from '../../context/data/myContext';
 
 function HeroSection() {
   const navigate = useNavigate();
+  const context = useContext(myContext);
+  const { setFilterType } = context;
+
+  const navigateToAllProducts = () => {
+    setFilterType('');
+    navigate('/allproducts');
+  };
 
   return (
     <div className="relative w-full h-screen overflow-hidden flex items-center justify-center">
@@ -45,13 +54,13 @@ function HeroSection() {
         {/* Buttons */}
         <div className="flex flex-row items-center justify-center gap-4">
           <button
-            onClick={() => navigate('/allproducts')}
+            onClick={navigateToAllProducts}
             className="bg-white text-black px-6 py-2.5 rounded-full font-bold text-sm md:text-base hover:bg-gray-200 transition-colors shadow-lg"
           >
             Explore
           </button>
           <button
-            onClick={() => navigate('/allproducts')} 
+            onClick={navigateToAllProducts}
             className="flex items-center gap-2 bg-white text-black px-6 py-2.5 rounded-full font-bold text-sm md:text-base hover:bg-gray-200 transition-colors shadow-lg"
           >
             Watch <FaPlay className="text-xs" />

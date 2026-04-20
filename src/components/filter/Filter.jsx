@@ -72,7 +72,7 @@ function Filter() {
       {/* Top Filter Summary */}
       <div className="mb-6 hidden lg:block">
         <ul className="space-y-3 text-[15px] font-medium text-[#111111] mb-8">
-          <li onClick={() => setFilterType('')} className={`cursor-pointer hover:text-gray-600 ${!filterType ? 'font-bold' : ''}`}>All Products</li>
+          <li onClick={() => { setFilterType(''); context.setSearchkey(''); }} className={`cursor-pointer hover:text-gray-600 ${!filterType ? 'font-bold' : ''}`}>All Products</li>
           {dynamicCategories.map((cat, index) => (
             <li key={index} onClick={() => setFilterType(cat)} className={`cursor-pointer hover:text-gray-600 ${filterType === cat ? 'font-bold' : ''}`}>
               {cat.charAt(0).toUpperCase() + cat.slice(1)}

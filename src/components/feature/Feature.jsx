@@ -10,9 +10,10 @@ import img4 from '../../assets/photo4.jpg';
 function Feature() {
   const navigate = useNavigate();
   const context = useContext(myContext);
-  const { mode } = context;
+  const { mode, setFilterType } = context;
 
   const navigateToAllProducts = () => {
+    setFilterType('');
     navigate('/allproducts');
   };
 

@@ -163,7 +163,22 @@ function MyState(props) {
   const getOrderData = async () => {
     setLoading(true)
     try {
-      const result = await getDocs(collection(fireDB, 'orders'))
+      const localUser = parseStoredUser();
+      const isAdmin = localUser?.profile?.role === 'admin';
+      const userId = localUser?.user?.uid;
+      
+      if (!isAdmin && !userId) {
+          setLoading(false);
+          return;
+      }
+      
+      let q = collection(fireDB, 'orders');
+      
+      if (!isAdmin) {
+          q = query(collection(fireDB, 'orders'), where('userid', '==', userId));
+      }
+
+      const result = await getDocs(q);
       const ordersArray = [];
       result.forEach((snapshotDoc) => {
         ordersArray.push({ ...snapshotDoc.data(), id: snapshotDoc.id });
@@ -171,6 +186,7 @@ function MyState(props) {
       setOrder(ordersArray);
       setLoading(false);
     } catch (error) {
+      console.error(error);
       toast.error('Failed to load orders');
       setLoading(false)
     }
@@ -217,8 +233,11 @@ function MyState(props) {
     const localUser = parseStoredUser();
     const isAdmin = localUser?.profile?.role === 'admin';
 
-    if (isAdmin) {
+    if (localUser) {
       getOrderData();
+    }
+
+    if (isAdmin) {
       getUserData();
     }
 

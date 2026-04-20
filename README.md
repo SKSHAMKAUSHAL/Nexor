@@ -9,7 +9,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.3.3-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Redux](https://img.shields.io/badge/Redux-2.2.7-764ABC?style=for-the-badge&logo=redux&logoColor=white)](https://redux-toolkit.js.org/)
 
-[Live Demo](https://shop-with-shopup.netlify.app/) • [Report Bug](https://github.com/SKSHAMKAUSHAL/Nexor/issues) • [Request Feature](https://github.com/SKSHAMKAUSHAL/Nexor/issues)
+[Live Demo](https://shop-with-Nexor Fit.netlify.app/) • [Report Bug](https://github.com/SKSHAMKAUSHAL/Nexor/issues) • [Request Feature](https://github.com/SKSHAMKAUSHAL/Nexor/issues)
 
 </div>
 
@@ -139,27 +139,27 @@ Or connect your GitHub repository to Netlify for automatic deployMants.
 ## 📸 Screenshots
 
 <div align="center">
-  <img src="./public/screen6.png" alt="ShopUp Screenshot" />
+  <img src="./public/screen6.png" alt="Nexor Fit Screenshot" />
 </div>
 
 <div align="center">
-  <img src="./public/screen5.png" alt="ShopUp Screenshot" />
+  <img src="./public/screen5.png" alt="Nexor Fit Screenshot" />
 </div>
 
 <div align="center">
-  <img src="./public/screen4.png" alt="ShopUp Screenshot" />
+  <img src="./public/screen4.png" alt="Nexor Fit Screenshot" />
 </div>
 
 <div align="center">
-  <img src="./public/screen3.png" alt="ShopUp Screenshot" />
+  <img src="./public/screen3.png" alt="Nexor Fit Screenshot" />
 </div>
 
 <div align="center">
-  <img src="./public/screen2.png" alt="ShopUp Screenshot" />
+  <img src="./public/screen2.png" alt="Nexor Fit Screenshot" />
 </div>
 
 <div align="center">
-  <img src="./public/screen1.png" alt="ShopUp Screenshot" />
+  <img src="./public/screen1.png" alt="Nexor Fit Screenshot" />
 </div>
 ## 🤝 Contributing
 

@@ -184,19 +184,30 @@ function Header() {
           {searchkey && (
             <div className="w-full max-w-2xl mt-6 bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100">
               {searchProducts.length > 0 ? (
-                searchProducts.map((item) => (
-                  <div
-                    key={item.id}
-                    onClick={() => handleSearchClick(item)}
-                    className="flex items-center gap-4 p-4 cursor-pointer transition-colors hover:bg-gray-50 border-b border-gray-50 last:border-none"
-                  >
-                    <img src={item.imageUrl} alt={item.title} className="w-16 h-16 object-cover rounded-lg shrink-0" />
-                    <div className="flex flex-col">
-                      <span className="text-base font-bold text-black">{item.title}</span>
-                      <span className="text-sm text-gray-500">{item.category}</span>
+                <>
+                  {searchProducts.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => handleSearchClick(item)}
+                      className="flex items-center gap-4 p-4 cursor-pointer transition-colors hover:bg-gray-50 border-b border-gray-50 last:border-none"
+                    >
+                      <img src={item.imageUrl} alt={item.title} className="w-16 h-16 object-cover rounded-lg shrink-0" />
+                      <div className="flex flex-col">
+                        <span className="text-base font-bold text-black">{item.title}</span>
+                        <span className="text-sm text-gray-500">{item.category}</span>
+                      </div>
                     </div>
+                  ))}
+                  <div 
+                    className="p-4 bg-gray-50 text-center font-semibold text-[#111111] hover:bg-gray-100 cursor-pointer border-t border-gray-200 transition-colors"
+                    onClick={() => {
+                        setIsSearchOpen(false);
+                        navigate('/allproducts');
+                    }}
+                  >
+                    See all results for "{searchkey}"
                   </div>
-                ))
+                </>
               ) : (
                 <div className="p-8 text-center text-gray-500 text-lg">No exact matches found</div>
               )}

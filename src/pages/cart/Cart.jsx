@@ -176,7 +176,7 @@ function Cart() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
             <div>
-              <h1 className="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight">Shopping Cart</h1>
+              <h1 className="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight text-[#111111] dark:text-white">Shopping Cart</h1>
               <p className="text-sm sm:text-base text-gray-500 mt-1 font-medium">{totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart</p>
             </div>
             <button

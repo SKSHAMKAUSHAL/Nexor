@@ -133,9 +133,19 @@ function Allproducts() {
         <div className="max-w-[1920px] mx-auto px-4 md:px-8 py-8">
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 sticky top-0 bg-white z-20 py-4">
-            <h1 className="text-[24px] tracking-tight font-medium text-[#111111] font-oswald mb-4 md:mb-0 capitalize">
-              {searchkey ? `Search Results: ${searchkey}` : filterType ? (['man', 'Woman', 'child'].includes(filterType.toLowerCase()) ? `${filterType.replace('man', 'Man').replace('child', 'kid')} Clothing` : filterType) : 'All Products'} ({filteredProducts.length})
-            </h1>
+            <div className="flex items-center gap-4 mb-4 md:mb-0">
+              <h1 className="text-[24px] tracking-tight font-medium text-[#111111] font-oswald capitalize">
+                {searchkey ? `Search Results: ${searchkey}` : filterType ? (['man', 'Woman', 'child'].includes(filterType.toLowerCase()) ? `${filterType.replace('man', 'Man').replace('child', 'kid')} Clothing` : filterType) : 'All Products'} ({filteredProducts.length})
+              </h1>
+              {searchkey && (
+                <button 
+                  onClick={() => context.setSearchkey('')}
+                  className="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full py-1 px-3 text-sm font-medium transition-colors"
+                >
+                  Clear Search <FaTimes className="ml-2 w-3 h-3" />
+                </button>
+              )}
+            </div>
             
             <div className="flex items-center text-[#111111] gap-6">
               <button onClick={() => setShowMobileFilter(true)} className="lg:hidden flex items-center gap-2 text-sm font-medium hover:text-gray-600">

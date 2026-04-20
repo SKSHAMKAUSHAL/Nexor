@@ -1,4 +1,4 @@
-﻿import { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import myContext from '../../../context/data/myContext';
 import { FaExclamationCircle } from 'react-icons/fa';
@@ -162,7 +162,7 @@ function AddProduct() {
 
                         <div>
                             <label htmlFor="price" className="block text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: labelColor }}>
-                                Price (₹) *
+                                Price (?) *
                             </label>
                             <input
                                 id="price"
@@ -267,7 +267,7 @@ function AddProduct() {
                                             onClick={() => setProducts({ ...products, sizes: products.sizes.filter((_, i) => i !== index) })}
                                             className="text-lg font-bold hover:opacity-70 transition-opacity"
                                         >
-                                            ×
+                                            �
                                         </button>
                                     </div>
                                 ))}
@@ -319,7 +319,7 @@ function AddProduct() {
                                             onClick={() => setProducts({ ...products, colors: products.colors.filter((_, i) => i !== index) })}
                                             className="text-lg font-bold hover:opacity-70 transition-opacity"
                                         >
-                                            ×
+                                            �
                                         </button>
                                     </div>
                                 ))}
@@ -351,7 +351,7 @@ function AddProduct() {
                                             onClick={() => removeImageUrl(index)}
                                             className="p-3 text-[#757575] hover:text-[#111111] dark:hover:text-white transition-colors"
                                         >
-                                            ✕
+                                            ?
                                         </button>
                                     )}
                                 </div>

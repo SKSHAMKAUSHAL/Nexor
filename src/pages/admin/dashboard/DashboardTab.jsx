@@ -110,9 +110,9 @@ function DashboardTab() {
                             <table className="w-full text-left">
                                 <thead className={`text-sm uppercase font-semibold tracking-wider ${themeColors.headerBg} ${themeColors.mutedText}`}>
                                     <tr>
+                                        <th className="px-6 py-4">S.No</th>
                                         <th className="px-6 py-4">ID</th>
-                                        <th className="px-6 py-4">Image</th>
-                                        <th className="px-6 py-4">Product Info</th>
+                                        <th className="px-6 py-4">Items</th>
                                         <th className="px-6 py-4">Customer Info</th>
                                         <th className="px-6 py-4">Status</th>
                                         <th className="px-6 py-4">Actions</th>
@@ -120,36 +120,43 @@ function DashboardTab() {
                                 </thead>
                                 <tbody className={`divide-y ${themeColors.border}`}>
                                     {order.map((allorder, index) => (
-                                        allorder.cartItems.map((item, itemIndex) => (
-                                            <tr key={`${index}-${itemIndex}`} className={`hover:${mode === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'} transition-colors`}>
-                                                <td className={`px-6 py-4 ${themeColors.text} font-medium`}>{allorder.payMantId}</td>
-                                                <td className="px-6 py-4">
-                                                    <img 
-                                                        className="w-16 h-16 object-cover rounded-lg shadow-sm border border-gray-200" 
-                                                        src={item.imageUrl} 
-                                                        alt={item.title} 
-                                                    />
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <p className={`font-semibold ${themeColors.text}`}>{item.title}</p>
-                                                    <p className={`text-sm mt-1 font-medium text-green-600`}>₹{item.price}</p>
-                                                    <p className={`text-xs mt-1 ${themeColors.mutedText}`}>Qty: {item.quantity}</p>
-                                                </td>
-                                                <td className={`px-6 py-4 text-sm ${themeColors.mutedText}`}>
-                                                    <p className={`font-semibold ${themeColors.text}`}>{allorder.addressInfo.name}</p>
-                                                    <p className="mt-1">{allorder.addressInfo.pincode}</p>
-                                                    <p>{allorder.addressInfo.date}</p>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${mode === 'dark' ? 'bg-indigo-900/50 text-indigo-300' : 'bg-indigo-100 text-indigo-700'}`}>
-                                                        {allorder.status}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <button onClick={() => deleteOrder(allorder)} className="text-red-600 hover:text-red-800 font-medium">Delete</button>
-                                                </td>
-                                            </tr>
-                                        ))
+                                        <tr key={index} className={`hover:${mode === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'} transition-colors`}>
+                                            <td className={`px-6 py-4 ${themeColors.text} font-medium`}>{index + 1}</td>
+                                            <td className={`px-6 py-4 ${themeColors.text} font-medium`}>{allorder.paymentId || allorder.payMantId || 'N/A'}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-col gap-3">
+                                                    {allorder.cartItems.map((item, itemIndex) => (
+                                                        <div key={itemIndex} className="flex gap-3 items-center">
+                                                            <img 
+                                                                className="w-12 h-12 object-cover rounded-lg shadow-sm border border-gray-200" 
+                                                                src={item.imageUrl} 
+                                                                alt={item.title} 
+                                                            />
+                                                            <div>
+                                                                <p className={`font-semibold ${themeColors.text} text-sm line-clamp-1`}>{item.title}</p>
+                                                                <div className="flex gap-2 items-center mt-1">
+                                                                    <p className={`text-xs font-medium text-green-600`}>₹{item.price}</p>
+                                                                    <p className={`text-xs ${themeColors.mutedText}`}>Qty: {item.quantity}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </td>
+                                            <td className={`px-6 py-4 text-sm ${themeColors.mutedText}`}>
+                                                <p className={`font-semibold ${themeColors.text}`}>{allorder.addressInfo.name}</p>
+                                                <p className="mt-1">{allorder.addressInfo.pincode}</p>
+                                                <p>{allorder.addressInfo.date}</p>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${mode === 'dark' ? 'bg-indigo-900/50 text-indigo-300' : 'bg-indigo-100 text-indigo-700'}`}>
+                                                    {allorder.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <button onClick={() => deleteOrder(allorder)} className="text-red-600 hover:text-red-800 font-medium">Delete</button>
+                                            </td>
+                                        </tr>
                                     ))}
                                 </tbody>
                             </table>

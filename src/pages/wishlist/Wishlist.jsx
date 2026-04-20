@@ -88,9 +88,9 @@ function Wishlist() {
           {/* Header */}
           <div className="text-center mb-12 animate-fade-in">
             <div className="flex items-center justify-center gap-3 mb-3">
-              <FaHeart className="text-4xl text-black dark:text-white" />
+              <FaHeart className="text-4xl text-[#111111] dark:text-white" />
               <h1 
-                className="text-4xl md:text-5xl font-bold text-black dark:text-white">
+                className="text-4xl md:text-5xl font-bold text-[#111111] dark:text-white">
                 My Wishlist
               </h1>
             </div>

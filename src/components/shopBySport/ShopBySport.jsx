@@ -12,7 +12,7 @@ import sport6 from '../../assets/sport6.jpg';
 function ShopBySport() {
   const navigate = useNavigate();
   const context = useContext(myContext);
-  const { mode } = context;
+  const { mode, setFilterType } = context;
   const scrollRef = useRef(null);
 
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -33,6 +33,7 @@ function ShopBySport() {
   }, []);
 
   const handleCardClick = () => {
+    setFilterType('');
     navigate('/allproducts');
   };
 

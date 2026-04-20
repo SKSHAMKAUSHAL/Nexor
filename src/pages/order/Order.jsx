@@ -29,11 +29,13 @@ function Order() {
   const userid = storedUser?.user?.uid || null;
   const navigate = useNavigate();
   const context = useContext(myContext);
-  const { mode, loading, order } = context;
+  const { mode, loading, order, getOrderData } = context;
 
   useEffect(() => {
     if (!userid) {
       navigate('/login');
+    } else {
+      getOrderData();
     }
   }, [userid, navigate]);
 
@@ -67,7 +69,7 @@ function Order() {
     // Search filter
     if (searchTerm) {
       filtered = filtered.filter(order => 
-        order.payMantId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (order.paymentId || order.payMantId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.addressInfo.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -118,9 +120,9 @@ function Order() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8 animate-fade-in">
             <div className="flex items-center justify-center gap-3 mb-3">
-              <FaBox className="text-4xl text-black dark:text-white" />
+              <FaBox className="text-4xl text-[#111111] dark:text-white" />
               <h1 
-                className="text-4xl md:text-5xl font-bold text-black dark:text-white"
+                className="text-4xl md:text-5xl font-bold text-[#111111] dark:text-white"
               >
                 My Orders
               </h1>
@@ -140,7 +142,7 @@ function Order() {
               {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 animate-fade-in">
                 <div 
-                  className="p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  className="p-6 rounded-2xl border-2 transition-colors duration-200 hover:shadow-md"
                   style={{
                     backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : 'white',
                     borderColor: mode === 'dark' ? 'rgb(75 85 99)' : '#e5e7eb'
@@ -250,7 +252,7 @@ function Order() {
                     return (
                       <div 
                         key={index} 
-                        className="border-2 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl animate-fade-in"
+                        className="border-2 rounded-2xl overflow-hidden transition-colors duration-200 hover:border-gray-400 dark:hover:border-gray-500 animate-fade-in"
                         style={{ 
                           backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : 'white',
                           borderColor: mode === 'dark' ? 'rgb(75 85 99)' : '#e5e7eb',
@@ -317,7 +319,7 @@ function Order() {
                           }`}
                         >
                           <div className="p-6 border-t-2" style={{ borderColor: mode === 'dark' ? 'rgb(75 85 99)' : '#e5e7eb' }}>
-                            {/* PayMant ID */}
+                            {/* PayMent ID */}
                             <div className="mb-6 p-4 rounded-xl border-2 border-dashed flex justify-between items-center"
                               style={{ 
                                 backgroundColor: mode === 'dark' ? 'rgb(31 41 55)' : '#f9fafb',
@@ -327,11 +329,11 @@ function Order() {
                               <div className="flex items-center gap-2 mb-1">
                                 <FaCreditCard className="text-black dark:text-white" />
                                 <span className="font-semibold uppercase tracking-wider text-sm" style={{ color: mode === 'dark' ? 'white' : '#1f2937' }}>
-                                  PayMant ID
+                                  Payment ID
                                 </span>
                               </div>
                               <p className="text-lg font-mono font-medium" style={{ color: mode === 'dark' ? '#9ca3af' : '#6b7280' }}>
-                                {order.payMantId}
+                                {order.paymentId || order.payMantId || 'N/A'}
                               </p>
                             </div>
 
@@ -437,10 +439,10 @@ function Order() {
                                 {order.cartItems.map((item, i) => (
                                   <div 
                                     key={i} 
-                                    className="flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]"
+                                    className="flex flex-col md:flex-row items-center gap-6 p-4 rounded-xl border-2 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800"
                                     style={{ 
                                       backgroundColor: mode === 'dark' ? 'rgb(31 41 55)' : 'white',
-                                      borderColor: mode === 'dark' ? 'rgb(75 85 99)' : '#e5e7eb'
+                                      borderColor: mode === 'dark' ? 'rgb(75 85 99)' : '#f3f4f6'
                                     }}
                                   >
                                     <img 
@@ -508,7 +510,7 @@ function Order() {
                 </p>
                 <button
                   onClick={() => navigate('/allproducts')}
-                  className="shadow-lg hover:shadow-2xl px-8 py-4 rounded-full font-bold transition-all duration-300 transform hover:scale-105 flex gap-2 items-center"
+                  className="shadow-md px-8 py-4 rounded-full font-bold transition-colors duration-200 hover:bg-gray-800 dark:hover:bg-gray-200 flex gap-2 items-center"
                   style={{
                     backgroundColor: mode === 'dark' ? 'white' : 'black',
                     color: mode === 'dark' ? 'black' : 'white',

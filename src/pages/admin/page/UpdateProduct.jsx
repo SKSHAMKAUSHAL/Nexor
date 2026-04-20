@@ -1,4 +1,4 @@
-﻿import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import myContext from '../../../context/data/myContext';
 
@@ -125,7 +125,7 @@ function UpdateProduct() {
 
                         <div>
                             <label className="block text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: labelColor }}>
-                                Price (₹) *
+                                Price (?) *
                             </label>
                             <input
                                 type="number"
@@ -223,7 +223,7 @@ function UpdateProduct() {
                                             onClick={() => setProducts({ ...products, sizes: products.sizes.filter((_, i) => i !== index) })}
                                             className="text-lg font-bold hover:opacity-70 transition-opacity"
                                         >
-                                            ×
+                                            �
                                         </button>
                                     </div>
                                 ))}
@@ -275,7 +275,7 @@ function UpdateProduct() {
                                             onClick={() => setProducts({ ...products, colors: products.colors.filter((_, i) => i !== index) })}
                                             className="text-lg font-bold hover:opacity-70 transition-opacity"
                                         >
-                                            ×
+                                            �
                                         </button>
                                     </div>
                                 ))}
@@ -305,7 +305,7 @@ function UpdateProduct() {
                                             onClick={() => removeImageUrl(index)}
                                             className="p-3 text-[#757575] hover:text-[#111111] dark:hover:text-white transition-colors"
                                         >
-                                            ✕
+                                            ?
                                         </button>
                                     )}
                                 </div>
