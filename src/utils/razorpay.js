@@ -32,7 +32,8 @@ export const processPayment = async ({
   }
 
   try {
-    const orderResponse = await fetch('http://localhost:5000/create-order', {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const orderResponse = await fetch(`${apiUrl}/create-order`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
