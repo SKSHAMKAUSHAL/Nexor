@@ -176,8 +176,8 @@ function Cart() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
             <div>
-              <h1 className="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight text-[#111111] dark:text-white">Shopping Cart</h1>
-              <p className="text-sm sm:text-base text-gray-500 mt-1 font-medium">{totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart</p>
+              <h1 className="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight text-gray-900 dark:text-white" style={{ color: mode === 'light' ? '#000000' : 'white' }}>Shopping Cart</h1>
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1 font-medium">{totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart</p>
             </div>
             <button
               onClick={() => {
@@ -186,7 +186,7 @@ function Cart() {
                   toast.info('Cart cleared');
                 }
               }}
-              className="text-sm font-bold uppercase tracking-widest text-gray-500 hover:text-black dark:hover:text-white transition-colors self-start sm:self-auto border-b-2 border-transparent hover:border-black dark:hover:border-white pb-1"
+              className="text-sm font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-yellow-100 dark:hover:bg-yellow-900 transition-colors self-start sm:self-auto border-b-2 border-transparent hover:border-black dark:hover:border-white pb-1 px-2 py-1 rounded"
             >
               Clear Cart
             </button>
@@ -216,10 +216,13 @@ function Cart() {
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
                         <div className="flex justify-between">
-                          <h2 className="text-lg sm:text-xl font-bold uppercase tracking-tight pr-4">{item.title}</h2>
-                          <p className="text-lg font-bold">₹{parseInt(item.price) * (item.quantity || 1)}</p>
+                          <h2 className="text-lg sm:text-xl font-bold uppercase tracking-tight pr-4" style={{ color: mode === 'light' ? 'black' : 'white' }}>{item.title}</h2>
+                          <p className="text-lg font-bold" style={{ color: mode === 'light' ? 'black' : 'white' }}>₹{parseInt(item.price) * (item.quantity || 1)}</p>
                         </div>
-                        <p className="text-sm text-gray-500 mt-1 capitalize font-medium">{item.category}</p>
+                        <p className="text-sm mt-1 capitalize font-medium" style={{ color: mode === 'light' ? '#4b5563' : '#d1d5db' }}>{item.category}</p>
+                        {(item.size || item.selectedVariation) && (
+                          <p className="text-sm mt-1 capitalize font-medium" style={{ color: mode === 'light' ? '#4b5563' : '#d1d5db' }}>Size: {item.size || item.selectedVariation}</p>
+                        )}
                       </div>
 
                       {/* Quantity & Actions */}
@@ -227,16 +230,16 @@ function Cart() {
                         <div className="flex items-center border-2 rounded-full px-2 py-1" style={{ borderColor: mode === 'dark' ? '#4b5563' : '#000' }}>
                           <button
                             onClick={() => handleDecrease(item)}
-                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors font-bold text-lg outline-none"
+                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-yellow-200 dark:hover:bg-yellow-700 transition-colors font-bold text-lg outline-none"
                           >
                             −
                           </button>
-                          <span className="w-12 text-center font-bold text-lg select-none">
+                          <span className="w-12 text-center font-bold text-lg select-none" style={{ color: mode === 'light' ? 'black' : 'white' }}>
                             {item.quantity || 1}
                           </span>
                           <button
                             onClick={() => handleIncrease(item)}
-                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors font-bold text-lg outline-none"
+                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-green-200 dark:hover:bg-green-700 transition-colors font-bold text-lg outline-none"
                           >
                             +
                           </button>
@@ -244,7 +247,7 @@ function Cart() {
 
                         <button
                           onClick={() => handleDelete(item)}
-                          className="text-gray-400 hover:text-red-500 transition-colors"
+                          className="text-gray-400 hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-900 p-2 rounded-lg transition-all"
                           aria-label="Remove item"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
@@ -259,7 +262,7 @@ function Cart() {
 
               {/* Continue Shopping */}
               <Link to="/allproducts">
-                <button className="mt-8 mb-4 w-full sm:w-auto flex items-center justify-center gap-2 font-bold uppercase tracking-widest text-sm border-2 border-black dark:border-white px-8 py-4 rounded-full transition-all hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black">
+                <button className="mt-8 mb-4 w-full sm:w-auto flex items-center justify-center gap-2 font-bold uppercase tracking-widest text-sm border-2 border-gray-900 dark:border-white px-8 py-4 rounded-full transition-all hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 hover:shadow-lg text-gray-900 dark:text-white" style={{ color: mode === 'light' ? '#000000' : 'white', borderColor: mode === 'light' ? '#000000' : 'white' }}>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
                   </svg>
@@ -343,7 +346,7 @@ function Cart() {
                       toast.error('Please login to checkout', { position: 'top-center' });
                       navigate('/login');
                     }}
-                    className="w-full flex items-center justify-center gap-3 bg-black text-white border-2 border-black py-4 rounded-full text-xl font-black uppercase tracking-widest transition-all animate-pulse hover:animate-none hover:bg-white hover:text-black hover:shadow-xl active:scale-95"
+                    className="w-full flex items-center justify-center gap-3 bg-black text-white border-2 border-black py-4 rounded-full text-xl font-black uppercase tracking-widest transition-all animate-pulse hover:animate-none hover:bg-white hover:text-black hover:shadow-xl hover:bg-gradient-to-r hover:from-green-100 hover:to-green-50 dark:hover:from-green-900 dark:hover:to-green-800 active:scale-95"
                   >
                     Guest Checkout
                   </button>

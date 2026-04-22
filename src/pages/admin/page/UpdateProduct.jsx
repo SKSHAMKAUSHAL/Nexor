@@ -40,6 +40,10 @@ function UpdateProduct() {
         if (!products.price || String(products.price).trim() === '') newErrors.price = 'Price is required';
         else if (isNaN(products.price) || parseFloat(products.price) <= 0) newErrors.price = 'Please enter a valid price';
         
+        if (products.salePrice && (isNaN(products.salePrice) || parseFloat(products.salePrice) < 0 || parseFloat(products.salePrice) >= parseFloat(products.price))) {
+             newErrors.salePrice = 'Sale price must be valid and less than original price';
+        }
+
         const validUrls = imageUrls.filter(url => url.trim() !== '' && isValidUrl(url));
         if (validUrls.length === 0) newErrors.imageUrl = 'At least one valid image URL is required';
         
@@ -125,7 +129,7 @@ function UpdateProduct() {
 
                         <div>
                             <label className="block text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: labelColor }}>
-                                Price (?) *
+                                Price (â‚¹) *
                             </label>
                             <input
                                 type="number"
@@ -135,6 +139,20 @@ function UpdateProduct() {
                                 style={{ backgroundColor: inputBg, color: textTheme }}
                             />
                             {errors.price && <p className="mt-1 text-sm text-[#9E3500]">{errors.price}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: labelColor }}>
+                                Sale Price (â‚¹) (Optional)
+                            </label>
+                            <input
+                                type="number"
+                                value={products.salePrice || ''}
+                                onChange={(e) => setProducts({ ...products, salePrice: e.target.value })}
+                                className="w-full px-4 py-3 rounded-none border focus:outline-none transition-colors border-[#E5E5E5] focus:border-[#111111] dark:border-[#333333] dark:focus:border-white font-oswald"
+                                style={{ backgroundColor: inputBg, color: textTheme }}
+                            />
+                            {errors.salePrice && <p className="mt-1 text-sm text-[#9E3500]">{errors.salePrice}</p>}
                         </div>
                     </div>
 
@@ -223,7 +241,7 @@ function UpdateProduct() {
                                             onClick={() => setProducts({ ...products, sizes: products.sizes.filter((_, i) => i !== index) })}
                                             className="text-lg font-bold hover:opacity-70 transition-opacity"
                                         >
-                                            ×
+                                            ï¿½
                                         </button>
                                     </div>
                                 ))}
@@ -275,7 +293,7 @@ function UpdateProduct() {
                                             onClick={() => setProducts({ ...products, colors: products.colors.filter((_, i) => i !== index) })}
                                             className="text-lg font-bold hover:opacity-70 transition-opacity"
                                         >
-                                            ×
+                                            ï¿½
                                         </button>
                                     </div>
                                 ))}

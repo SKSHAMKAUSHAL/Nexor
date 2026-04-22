@@ -24,6 +24,10 @@ function Allproducts() {
 
   const navigate = useNavigate();
 
+  // Get sale query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const isSaleFilterActive = urlParams.get('sale') === 'true';
+
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const userId = user?.user?.uid;
 
@@ -41,17 +45,18 @@ function Allproducts() {
   const toggleWishlist = (e, product) => {
     e.stopPropagation();
     
+    const isInWishlist = wishlist.some(item => item.id === product.id);
+    const salePrice = product.salePrice && product.salePrice > 0 && product.salePrice < product.price ? product.salePrice : 0;
+    
     // We assume you have sanitizeForCart or similar in Allproducts if needed. If not, we just pass the product minus circular/Firestore ref
     const payload = {
         id: product.id,
         title: product.title,
-        price: product.price,
+        price: salePrice > 0 ? salePrice : product.price,
         imageUrl: product.imageUrl,
         category: product.category,
         description: product.description
     };
-    
-    const isInWishlist = wishlist.some(item => item.id === product.id);
     if (isInWishlist) {
       dispatch(removeFromWishlist(product.id));
       toast.info('Removed from wishlist');
@@ -100,6 +105,12 @@ function Allproducts() {
   const getFilteredProducts = () => {
     let filtered = product
       .filter((obj) => {
+        if (isSaleFilterActive) {
+          return obj.salePrice && Number(obj.salePrice) > 0 && Number(obj.salePrice) < Number(obj.price);
+        }
+        return true;
+      })
+      .filter((obj) => {
         const searchLower = searchkey.toLowerCase();
         if (!searchLower) return true;
         return (
@@ -134,13 +145,21 @@ function Allproducts() {
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 sticky top-0 bg-white z-20 py-4">
             <div className="flex items-center gap-4 mb-4 md:mb-0">
-              <h1 className="text-[24px] tracking-tight font-medium text-[#111111] font-oswald capitalize">
-                {searchkey ? `Search Results: ${searchkey}` : filterType ? (['man', 'Woman', 'child'].includes(filterType.toLowerCase()) ? `${filterType.replace('man', 'Man').replace('child', 'kid')} Clothing` : filterType) : 'All Products'} ({filteredProducts.length})
+              <h1 className="text-[24px] tracking-tight font-bold text-black font-oswald capitalize shadow-sm">
+                {isSaleFilterActive ? 'Sale Products' : searchkey ? `Search Results: ${searchkey}` : filterType ? (['man', 'Woman', 'child'].includes(filterType.toLowerCase()) ? `${filterType.replace('man', 'Man').replace('child', 'kid')} Clothing` : filterType) : 'All Products'} ({filteredProducts.length})
               </h1>
-              {searchkey && (
+              {isSaleFilterActive && (
+                <button 
+                  onClick={() => navigate('/allproducts')}
+                  className="flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-full py-1 px-3 text-sm transition-all hover:shadow-md"
+                >
+                  Clear Sale Filter <FaTimes className="ml-2 w-3 h-3" />
+                </button>
+              )}
+              {searchkey && !isSaleFilterActive && (
                 <button 
                   onClick={() => context.setSearchkey('')}
-                  className="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full py-1 px-3 text-sm font-medium transition-colors"
+                  className="flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-full py-1 px-3 text-sm transition-all hover:shadow-md"
                 >
                   Clear Search <FaTimes className="ml-2 w-3 h-3" />
                 </button>
@@ -148,21 +167,21 @@ function Allproducts() {
             </div>
             
             <div className="flex items-center text-[#111111] gap-6">
-              <button onClick={() => setShowMobileFilter(true)} className="lg:hidden flex items-center gap-2 text-sm font-medium hover:text-gray-600">
+              <button onClick={() => setShowMobileFilter(true)} className="lg:hidden flex items-center gap-2 text-sm font-medium hover:text-gray-600 hover:bg-yellow-100 px-2 py-1 rounded transition-all">
                 Show Filters
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M21 4H3M21 12H3M21 20H3" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
 
-              <button onClick={() => setShowDesktopFilter(!showDesktopFilter)} className="hidden lg:flex items-center gap-2 text-sm font-medium hover:text-gray-600">
+              <button onClick={() => setShowDesktopFilter(!showDesktopFilter)} className="hidden lg:flex items-center gap-2 text-sm font-medium hover:text-gray-600 hover:bg-yellow-100 px-2 py-1 rounded transition-all">
                 {showDesktopFilter ? 'Hide Filters' : 'Show Filters'}
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M21 4H3M21 12H3M21 20H3" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
 
-              <div className="flex items-center gap-2 text-sm font-medium cursor-pointer hover:text-gray-600 relative">
+              <div className="flex items-center gap-2 text-sm font-medium cursor-pointer hover:text-gray-600 hover:bg-blue-100 px-2 py-1 rounded transition-all relative">
                 Sort By
                 <select
                   value={sortBy}
@@ -232,7 +251,7 @@ function Allproducts() {
                       
                       <button
                         onClick={(e) => toggleWishlist(e, item)}
-                        className="absolute top-3 right-3 p-2 rounded-full cursor-pointer z-10 hover:bg-white transition-colors"
+                        className="absolute top-3 right-3 p-2 rounded-full cursor-pointer z-10 hover:bg-red-100 transition-all duration-300 hover:scale-110"
                       >
                          <svg 
                            className={`w-5 h-5 transition-colors ${isInWishlist ? "fill-black stroke-black" : "fill-transparent stroke-black hover:stroke-gray-500"}`} 

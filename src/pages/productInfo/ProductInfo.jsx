@@ -81,11 +81,13 @@ function ProductInfo() {
             ? safe.images[0]
             : (isValidUrl(safe.imageUrl) ? safe.imageUrl : '');
         
+        const salePrice = safe.salePrice && safe.salePrice > 0 && safe.salePrice < safe.price ? safe.salePrice : 0;
+        
         // Keep only necessary fields to keep cart lean
         return {
             id: safe.id || '',
             title: safe.title || '',
-            price: safe.price || 0,
+            price: salePrice > 0 ? salePrice : (safe.price || 0),
             imageUrl: imageUrl,
             description: safe.description || '',
             category: safe.category || '',
@@ -164,9 +166,12 @@ function ProductInfo() {
     const availableSizes = products?.sizes && products.sizes.length > 0 ? products.sizes : ['S', 'M', 'L', 'XL', '2XL', '3XL'];
 
     // Calculate original price for UI if needed (to show the discount like in image)
-    const currentPrice = products?.price || 12796;
-    const originalPrice = products?.originalPrice || Math.round(currentPrice * 1.25);
-    const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+    const discountPercent = products?.salePrice && products.salePrice > 0 && products.salePrice < products.price
+        ? Math.round(((products.price - products.salePrice) / products.price) * 100)
+        : 0;
+    
+    const currentPrice = discountPercent > 0 ? products.salePrice : (products?.price || 12796);
+    const originalPrice = discountPercent > 0 ? products.price : 0;
 
     return (
         <Layout>

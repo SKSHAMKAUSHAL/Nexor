@@ -86,11 +86,11 @@ function Wishlist() {
       <div className="min-h-screen py-10 px-4 md:px-10">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-12 animate-fade-in">
+          <div className="text-center mb-12 animate-fade-in bg-white dark:bg-gray-900 py-8 rounded-2xl border-2 border-black dark:border-white">
             <div className="flex items-center justify-center gap-3 mb-3">
-              <FaHeart className="text-4xl text-[#111111] dark:text-white" />
+              <FaHeart className="text-4xl text-black dark:text-white" />
               <h1 
-                className="text-4xl md:text-5xl font-bold text-[#111111] dark:text-white">
+                className="text-4xl md:text-5xl font-black text-black dark:text-white drop-shadow-lg">
                 My Wishlist
               </h1>
             </div>
@@ -99,7 +99,7 @@ function Wishlist() {
               <div className="h-1 w-10 bg-gray-400 dark:bg-gray-500 rounded-full"></div>
               <div className="h-1 w-5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
             </div>
-            <p className="text-lg mt-2" style={{ color: mode === 'dark' ? '#9ca3af' : '#6b7280' }}>
+            <p className="text-lg mt-2 text-gray-800 dark:text-gray-200 font-medium">
               {wishlist.length} {wishlist.length === 1 ? 'item' : 'items'} saved for later
             </p>
           </div>
@@ -118,8 +118,8 @@ function Wishlist() {
                   {/* Delete Button */}
                   <button
                     onClick={() => removeFromWishlistHandler(item)}
-                      className="absolute top-4 right-4 z-10 p-3 bg-white rounded-full shadow-lg transition-all duration-300 hover:bg-black hover:text-white hover:scale-110"
-                      style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : 'white' }}>
+                      className="absolute top-4 right-4 z-10 p-3 bg-red-100 text-red-600 rounded-full shadow-lg transition-all duration-300 hover:bg-red-600 hover:text-white hover:scale-110"
+                      style={{ backgroundColor: mode === 'dark' ? 'rgb(127, 29, 29)' : '#fee2e2' }}>
                       <FaTrash />
                     </button>
   
@@ -168,7 +168,7 @@ function Wishlist() {
                       {/* Add to Cart Button */}
                       <button
                         onClick={() => addToCartHandler(item)}
-                        className="w-full py-3 rounded-full font-bold transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center gap-2"
+                        className="w-full py-3 rounded-full font-bold transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center gap-2 hover:bg-gray-800 dark:hover:bg-gray-100"
                         >
                         <FaShoppingCart />
                         Add To Cart

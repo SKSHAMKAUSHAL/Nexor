@@ -118,11 +118,11 @@ function Order() {
       <div className="min-h-screen py-10 px-4 md:px-10 mb-20">
         {/* Header Section */}
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8 animate-fade-in">
+          <div className="text-center mb-8 animate-fade-in bg-white dark:bg-gray-900 py-8 rounded-2xl border-2 border-black dark:border-white">
             <div className="flex items-center justify-center gap-3 mb-3">
-              <FaBox className="text-4xl text-[#111111] dark:text-white" />
+              <FaBox className="text-4xl text-black dark:text-white" />
               <h1 
-                className="text-4xl md:text-5xl font-bold text-[#111111] dark:text-white"
+                className="text-4xl md:text-5xl font-black text-black dark:text-white drop-shadow-lg"
               >
                 My Orders
               </h1>
@@ -132,7 +132,7 @@ function Order() {
               <div className="h-1 w-10 bg-gray-400 dark:bg-gray-500 rounded-full"></div>
               <div className="h-1 w-5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
             </div>
-            <p className="text-gray-500 mt-2" style={{ color: mode === 'dark' ? '#9ca3af' : '' }}>
+            <p className="text-gray-800 dark:text-gray-200 mt-2 font-medium text-lg">
               Track and manage your orders
             </p>
           </div>
@@ -142,7 +142,7 @@ function Order() {
               {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 animate-fade-in">
                 <div 
-                  className="p-6 rounded-2xl border-2 transition-colors duration-200 hover:shadow-md"
+                  className="p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-400"
                   style={{
                     backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : 'white',
                     borderColor: mode === 'dark' ? 'rgb(75 85 99)' : '#e5e7eb'
@@ -162,7 +162,7 @@ function Order() {
                 </div>
 
                 <div 
-                  className="p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  className="p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl hover:scale-105 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-400"
                   style={{
                     backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : 'white',
                     borderColor: mode === 'dark' ? 'rgb(75 85 99)' : '#e5e7eb'
@@ -182,7 +182,7 @@ function Order() {
                 </div>
 
                 <div 
-                  className="p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  className="p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl hover:scale-105 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-400"
                   style={{
                     backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : 'white',
                     borderColor: mode === 'dark' ? 'rgb(75 85 99)' : '#e5e7eb'
@@ -215,7 +215,7 @@ function Order() {
                     placeholder="Search by Order ID or Name..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 rounded-full border-2 font-medium transition-all duration-300 focus:outline-none focus:border-black dark:focus:border-white"
+                    className="w-full pl-12 pr-4 py-3 rounded-full border-2 font-medium transition-all duration-300 focus:outline-none focus:border-black dark:focus:border-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-white dark:focus:bg-gray-800"
                     style={{
                       backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : 'white',
                       color: mode === 'dark' ? 'white' : '#1f2937',
@@ -228,7 +228,7 @@ function Order() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-4 py-3 rounded-full border-2 font-medium cursor-pointer transition-all duration-300 hover:border-gray-800 dark:hover:border-gray-300 focus:outline-none focus:border-black dark:focus:border-white"
+                  className="px-4 py-3 rounded-full border-2 font-medium cursor-pointer transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-400 focus:outline-none focus:border-black dark:focus:border-white"
                   style={{
                     backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : 'white',
                     color: mode === 'dark' ? 'white' : '#1f2937',
@@ -261,7 +261,7 @@ function Order() {
                       >
                         {/* Order Header - Always Visible */}
                         <div 
-                          className="p-6 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300"
+                          className="p-6 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 hover:border-l-4 hover:border-black dark:hover:border-white"
                           onClick={() => toggleOrder(index)}
                           >
                           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

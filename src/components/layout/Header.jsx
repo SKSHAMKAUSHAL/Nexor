@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiUser, FiLogOut } from 'react-icons/fi';
+import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiUser, FiLogOut, FiTag } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import myContext from '../../context/data/myContext';
@@ -41,6 +41,13 @@ function Header() {
     navigate(`/productinfo/${item.id}`);
   };
 
+  const handleSearchToAllProducts = () => {
+    if (searchkey.trim()) {
+      setIsSearchOpen(false);
+      navigate('/allproducts');
+    }
+  };
+
   const handleProfileClick = () => {
     if (isLoggedIn) {
       setIsProfileMenuOpen((prev) => !prev);
@@ -70,21 +77,22 @@ function Header() {
         </Link>
 
         <nav className="hidden lg:flex items-center gap-7 font-bold text-[15px] tracking-wide text-[#111111]">
+          <button onClick={() => navigate('/allproducts?sale=true')} className="flex items-center gap-1.5 text-red-600 hover:border-b-2 border-red-600 pb-1 bg-transparent transform transition-transform hover:scale-105"><FiTag className="text-lg animate-pulse" /> Sale</button>
           <button onClick={() => setGenderFilter('man')} className="hover:border-b-2 border-black pb-1 bg-transparent">Men</button>
           <button onClick={() => setGenderFilter('women')} className="hover:border-b-2 border-black pb-1 bg-transparent">Women</button>
           <button onClick={() => setGenderFilter('child')} className="hover:border-b-2 border-black pb-1 bg-transparent">Kids</button>
         </nav>
 
         <div className="flex items-center justify-end gap-3 lg:gap-5 w-[140px] lg:w-[240px]">
-          <button className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors" onClick={() => setIsSearchOpen(true)}>
+          <button className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-yellow-100 transition-colors" onClick={() => setIsSearchOpen(true)}>
             <FiSearch className="text-2xl text-[#111111]" />
           </button>
 
-          <button className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors" onClick={() => navigate('/wishlist')}>
+          <button className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-red-100 transition-colors" onClick={() => navigate('/wishlist')}>
             <FiHeart className="text-2xl text-[#111111]" />
           </button>
 
-          <button className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors relative" onClick={() => navigate('/cart')}>
+          <button className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-blue-100 transition-colors relative" onClick={() => navigate('/cart')}>
             <FiShoppingBag className="text-2xl text-[#111111]" />
             {cartItemCount > 0 && (
               <span className="absolute top-1.5 right-1.5 bg-[#111111] text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
@@ -95,7 +103,7 @@ function Header() {
 
           <div className="relative">
             <button
-              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors relative"
+              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-purple-100 transition-colors relative"
               onClick={handleProfileClick}
               title={isLoggedIn ? 'Account' : 'Sign In'}
             >
@@ -105,16 +113,16 @@ function Header() {
 
             {isLoggedIn && isProfileMenuOpen && (
               <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                  <div className="p-4 border-b border-gray-100 overflow-hidden">
+                  <div className="p-4 border-b border-gray-100 overflow-hidden bg-gradient-to-r from-purple-50 to-pink-50">
                     <p className="text-[#111111] font-medium text-sm truncate" title={user?.user?.email}>{user?.user?.email || 'My Account'}</p>
                 </div>
                 <div className="p-3 space-y-2">
-                  <Link to="/order" className="block px-4 py-2 text-[#111111] text-sm hover:bg-[#F5F5F5] rounded transition-colors" onClick={() => setIsProfileMenuOpen(false)}>My Orders</Link>
-                  <Link to="/wishlist" className="block px-4 py-2 text-[#111111] text-sm hover:bg-[#F5F5F5] rounded transition-colors" onClick={() => setIsProfileMenuOpen(false)}>Wishlist</Link>
+                  <Link to="/order" className="block px-4 py-2 text-[#111111] text-sm hover:bg-yellow-100 rounded transition-colors font-medium" onClick={() => setIsProfileMenuOpen(false)}>My Orders</Link>
+                  <Link to="/wishlist" className="block px-4 py-2 text-[#111111] text-sm hover:bg-red-100 rounded transition-colors font-medium" onClick={() => setIsProfileMenuOpen(false)}>Wishlist</Link>
                   {user?.profile?.role === 'admin' ? (
-                    <Link to="/dashboard" className="block px-4 py-2 text-[#111111] text-sm hover:bg-[#F5F5F5] font-bold rounded transition-colors" onClick={() => setIsProfileMenuOpen(false)}>Admin Dashboard</Link>
+                    <Link to="/dashboard" className="block px-4 py-2 text-[#111111] text-sm hover:bg-green-100 rounded transition-colors font-bold" onClick={() => setIsProfileMenuOpen(false)}>Admin Dashboard</Link>
                   ) : null}
-                  <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-[#111111] text-sm hover:bg-[#F5F5F5] rounded transition-colors flex items-center gap-2">
+                  <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-[#111111] text-sm hover:bg-red-200 rounded transition-colors flex items-center gap-2 font-medium">
                     <FiLogOut className="text-sm" />
                     Sign Out
                   </button>
@@ -131,6 +139,7 @@ function Header() {
 
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed top-[60px] left-0 w-full h-[calc(100vh-60px)] bg-white z-40 p-6 flex flex-col gap-6 overflow-y-auto">
+          <button className="flex items-center gap-2 text-2xl font-bold text-red-600 text-left transform transition-transform hover:translate-x-2" onClick={() => { navigate('/allproducts?sale=true'); setIsMobileMenuOpen(false); }}><FiTag className="text-2xl animate-pulse" /> Sale</button>
           <button className="text-2xl font-bold text-[#111111] text-left" onClick={() => { setGenderFilter('man'); setIsMobileMenuOpen(false); }}>Men</button>
           <button className="text-2xl font-bold text-[#111111] text-left" onClick={() => { setGenderFilter('women'); setIsMobileMenuOpen(false); }}>Women</button>
           <button className="text-2xl font-bold text-[#111111] text-left" onClick={() => { setGenderFilter('child'); setIsMobileMenuOpen(false); }}>Kids</button>
@@ -189,7 +198,7 @@ function Header() {
                     <div
                       key={item.id}
                       onClick={() => handleSearchClick(item)}
-                      className="flex items-center gap-4 p-4 cursor-pointer transition-colors hover:bg-gray-50 border-b border-gray-50 last:border-none"
+                      className="flex items-center gap-4 p-4 cursor-pointer transition-colors hover:bg-yellow-50 border-b border-gray-50 last:border-none"
                     >
                       <img src={item.imageUrl} alt={item.title} className="w-16 h-16 object-cover rounded-lg shrink-0" />
                       <div className="flex flex-col">
@@ -199,7 +208,7 @@ function Header() {
                     </div>
                   ))}
                   <div 
-                    className="p-4 bg-gray-50 text-center font-semibold text-[#111111] hover:bg-gray-100 cursor-pointer border-t border-gray-200 transition-colors"
+                    className="p-4 bg-blue-50 text-center font-semibold text-[#111111] hover:bg-blue-100 cursor-pointer border-t border-gray-200 transition-colors"
                     onClick={() => {
                         setIsSearchOpen(false);
                         navigate('/allproducts');

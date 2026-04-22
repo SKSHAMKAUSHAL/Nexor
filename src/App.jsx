@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Route,
@@ -33,11 +33,26 @@ const getStoredUser = () => {
     return null;
   }
 };
+
 function App() {
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    // Show initial Loader for 2 seconds (giving background components time to mount/fetch data)
+    const timer = setTimeout(() => {
+      setInitialLoading(false);
+    }, 2000); 
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <MyState>
+      {/* Explicit Top-Level App Loader - Controls initial app mount */}
+      <Loader fullScreen={true} isVisible={initialLoading} />
+
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <Suspense fallback={<Loader />}>
+        <Suspense fallback={<Loader fullScreen={true} isVisible={true} />}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/allproducts" element={<Allproducts />} />
