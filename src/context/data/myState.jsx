@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import MyContext from './myContext'
+import ResourceContext from '../ResourceContext';
 import { Timestamp, addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, query, setDoc, where } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { fireDB } from '../../firebase/FirebaseConfig';
@@ -32,6 +33,7 @@ function MyState(props) {
     return savedMode || 'light';
   });
   const [loading, setLoading] = useState(false);
+  const resourceContext = useContext(ResourceContext);
 
   useEffect(() => {
     if (mode === 'dark') {
@@ -110,15 +112,32 @@ function MyState(props) {
         });
         setProduct(productsArray)
         setLoading(false);
+        // Notify resource loader that products are ready
+        if (resourceContext?.markResourceReady) {
+          resourceContext.markResourceReady('products-data');
+        }
       }, (error) => {
         toast.error('Failed to load products: ' + error.message)
         setLoading(false)
+        // Mark as ready even on error to prevent infinite loading
+        if (resourceContext?.markResourceReady) {
+          resourceContext.markResourceReady('products-data');
+        }
       });
+
+      // Register the products data resource
+      if (resourceContext?.registerResource) {
+        resourceContext.registerResource('products-data');
+      }
 
       return unsubscribe;
     } catch (error) {
       toast.error('Failed to load products: ' + error.message)
       setLoading(false)
+      // Mark as ready even on error
+      if (resourceContext?.markResourceReady) {
+        resourceContext.markResourceReady('products-data');
+      }
       return null;
     }
   }

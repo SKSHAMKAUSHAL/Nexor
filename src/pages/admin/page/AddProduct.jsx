@@ -9,12 +9,28 @@ function AddProduct() {
     const { products, setProducts, addProduct, mode, product, loading } = context;
     const navigate = useNavigate();
     
-    // Category mapping by type
-    const categoryByType = {
-        man: ['T-Shirts', 'Shirts', 'Hoodies & Sweatshirts', 'Jackets & Vests', 'Shorts', 'Pants & Trousers', 'Tracksuits', 'Innerwear', 'Socks', 'Swimwear', 'Jerseys', 'Compression Wear', 'Other'],
-        Woman: ['T-Shirts & Tops', 'Sports Bras', 'Hoodies & Sweatshirts', 'Jackets', 'Leggings & Tights', 'Shorts', 'Skirts & Dresses', 'Tracksuits', 'Pants & Joggers', 'Innerwear', 'Swimwear', 'Other'],
-        child: ['T-Shirts', 'Hoodies', 'Jackets', 'Shorts', 'Pants', 'Tracksuits', 'School Shoes', 'Socks', 'Other'],
-        other: ['Other']
+    // Dynamic Category Config
+    const CATEGORY_CONFIG = {
+        'Mens Clothing': {
+            fields: ['sizes', 'colors', 'material'],
+            sizeOptions: ['S', 'M', 'L', 'XL', 'XXL'],
+        },
+        'Womens Clothing': {
+            fields: ['sizes', 'colors', 'material'],
+            sizeOptions: ['XS', 'S', 'M', 'L', 'XL'],
+        },
+        'Shoes': {
+            fields: ['sizes', 'colors', 'gender'],
+            sizeOptions: ['6', '7', '8', '9', '10', '11', '12'],
+        },
+        'Accessories': {
+            fields: ['colors', 'material'],
+            sizeOptions: [], // mostly one size
+        },
+        'Equipment': {
+            fields: ['weight', 'material'],
+            sizeOptions: [], 
+        }
     };
     
     const [errors, setErrors] = useState({});
@@ -202,19 +218,18 @@ function AddProduct() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label htmlFor="category" className="block text-sm font-semibold uppercase tracking-wider mb-2" style={{ color: labelColor }}>
-                                Category *
+                                Dynamic Category *
                             </label>
                             <select
                                 id="category"
                                 name="category"
                                 value={products.category || ''}
                                 onChange={(e) => setProducts({ ...products, category: e.target.value })}
-                                disabled={!products.type}
                                 className="w-full px-4 py-3 rounded-none border focus:outline-none transition-colors appearance-none border-[#E5E5E5] focus:border-[#111111] dark:border-[#333333] dark:focus:border-white disabled:opacity-50"
                                 style={{ backgroundColor: inputBg, color: textTheme }}
                             >
-                                <option value="" disabled>Select Category (Select Type First)</option>
-                                {products.type && categoryByType[products.type]?.map((cat, index) => (
+                                <option value="" disabled>Select Core Category</option>
+                                {Object.keys(CATEGORY_CONFIG).map((cat, index) => (
                                     <option key={index} value={cat}>{cat}</option>
                                 ))}
                             </select>

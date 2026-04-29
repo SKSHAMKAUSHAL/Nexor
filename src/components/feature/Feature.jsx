@@ -1,6 +1,7 @@
-import { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useContext, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import myContext from '../../context/data/myContext';
+import ResourceContext from '../../context/ResourceContext';
 
 import img1 from '../../assets/photo1.jpg';
 import img2 from '../../assets/photo2.jpg';
@@ -9,8 +10,26 @@ import img4 from '../../assets/photo4.jpg';
 
 function Feature() {
   const navigate = useNavigate();
+  const location = useLocation();
   const context = useContext(myContext);
+  const resourceContext = useContext(ResourceContext);
   const { mode, setFilterType } = context;
+
+  // Preload all feature images on home page
+  useEffect(() => {
+    if (location.pathname === '/' && resourceContext) {
+      const images = [
+        { src: img1, id: 'feature-img-1' },
+        { src: img2, id: 'feature-img-2' },
+        { src: img3, id: 'feature-img-3' },
+        { src: img4, id: 'feature-img-4' }
+      ];
+
+      images.forEach(({ src, id }) => {
+        resourceContext.preloadImage(src, id);
+      });
+    }
+  }, [location.pathname, resourceContext]);
 
   const navigateToAllProducts = () => {
     setFilterType('');
@@ -65,6 +84,7 @@ function Feature() {
                 src={item.image}
                 alt={item.title || item.category}
                 className="absolute w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="eager"
               />
               <div className="absolute inset-0 bg-black bg-opacity-0 transition-opacity duration-500 group-hover:bg-opacity-20" />
               <div className="absolute bottom-8 left-8 text-white text-left z-10 flex flex-col items-start w-full pr-8">

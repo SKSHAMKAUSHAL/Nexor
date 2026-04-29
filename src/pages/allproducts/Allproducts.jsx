@@ -24,9 +24,11 @@ function Allproducts() {
 
   const navigate = useNavigate();
 
-  // Get sale query parameter
+  // URL parameters for advanced filtering
   const urlParams = new URLSearchParams(window.location.search);
   const isSaleFilterActive = urlParams.get('sale') === 'true';
+  const categoryParam = urlParams.get('category')?.toLowerCase();
+  const subcategoryParam = urlParams.get('subcategory')?.toLowerCase();
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const userId = user?.user?.uid;
@@ -111,6 +113,22 @@ function Allproducts() {
         return true;
       })
       .filter((obj) => {
+        if (categoryParam) {
+          const itemCategory = (obj.category || '').toLowerCase();
+          return itemCategory.includes(categoryParam);
+        }
+        return true;
+      })
+      .filter((obj) => {
+        if (subcategoryParam) {
+          const itemDesc = (obj.description || '').toLowerCase();
+          const itemTitle = (obj.title || '').toLowerCase();
+          const itemCategory = (obj.category || '').toLowerCase();
+          return itemTitle.includes(subcategoryParam) || itemDesc.includes(subcategoryParam) || itemCategory.includes(subcategoryParam);
+        }
+        return true;
+      })
+      .filter((obj) => {
         const searchLower = searchkey.toLowerCase();
         if (!searchLower) return true;
         return (
@@ -146,7 +164,7 @@ function Allproducts() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 sticky top-0 bg-white z-20 py-4">
             <div className="flex items-center gap-4 mb-4 md:mb-0">
               <h1 className="text-[24px] tracking-tight font-bold text-black font-oswald capitalize shadow-sm">
-                {isSaleFilterActive ? 'Sale Products' : searchkey ? `Search Results: ${searchkey}` : filterType ? (['man', 'Woman', 'child'].includes(filterType.toLowerCase()) ? `${filterType.replace('man', 'Man').replace('child', 'kid')} Clothing` : filterType) : 'All Products'} ({filteredProducts.length})
+                {isSaleFilterActive ? 'Sale Products' : searchkey ? `Search Results: ${searchkey}` : categoryParam ? `${categoryParam} ${subcategoryParam || 'Products'}` : filterType ? (['man', 'Woman', 'child'].includes(filterType.toLowerCase()) ? `${filterType.replace('man', 'Man').replace('child', 'kid')} Clothing` : filterType) : 'All Products'} ({filteredProducts.length})
               </h1>
               {isSaleFilterActive && (
                 <button 

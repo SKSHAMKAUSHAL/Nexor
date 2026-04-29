@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState, useEffect } from 'react';
+import { Suspense, lazy, useState, useEffect, useContext } from 'react';
 import {
   BrowserRouter as Router,
   Route,
@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import MyState from './context/data/myState';
+import { ResourceProvider, ResourceContext } from './context/ResourceContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -34,21 +35,30 @@ const getStoredUser = () => {
   }
 };
 
-function App() {
+function AppContent() {
   const [initialLoading, setInitialLoading] = useState(true);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
+  const resourceContext = useContext(ResourceContext);
+  const allResourcesReady = resourceContext?.allResourcesReady || false;
 
+  // Enforce minimum 2 second loading time
   useEffect(() => {
-    // Show initial Loader for 2 seconds (giving background components time to mount/fetch data)
-    const timer = setTimeout(() => {
-      setInitialLoading(false);
-    }, 2000); 
-    
-    return () => clearTimeout(timer);
+    const minTimeTimer = setTimeout(() => {
+      setMinTimeElapsed(true);
+    }, 2000);
+    return () => clearTimeout(minTimeTimer);
   }, []);
 
+  // Hide loader when both min time elapsed AND all resources are ready
+  useEffect(() => {
+    if (minTimeElapsed && allResourcesReady) {
+      setInitialLoading(false);
+    }
+  }, [minTimeElapsed, allResourcesReady]);
+
   return (
-    <MyState>
-      {/* Explicit Top-Level App Loader - Controls initial app mount */}
+    <>
+      {/* Loading screen shown until resources load and min time passes */}
       <Loader fullScreen={true} isVisible={initialLoading} />
 
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -98,10 +108,19 @@ function App() {
           limit={3}
         />
       </Router>
-    </MyState>
+    </>
   );
 }
-export default App;
+
+function App() {
+  return (
+    <ResourceProvider>
+      <MyState>
+        <AppContent />
+      </MyState>
+    </ResourceProvider>
+  );
+}
 // Protected Route for authenticated users
 export const ProtectedRoute = ({ children }) => {
   const user = getStoredUser();
@@ -127,3 +146,5 @@ ProtectedRoute.propTypes = {
 ProtectedRouteForAdmin.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export default App;

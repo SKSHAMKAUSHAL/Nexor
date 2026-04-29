@@ -1,12 +1,117 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiUser, FiLogOut, FiTag } from 'react-icons/fi';
+import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiUser, FiLogOut, FiTag, FiChevronDown } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import myContext from '../../context/data/myContext';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const MEGA_MENU_DATA = [
+  {
+    id: 'men',
+    label: 'Men',
+    columns: [
+      {
+        title: 'Clothing',
+        links: [
+          { label: 'All Clothing', href: '/allproducts?category=men&subcategory=clothing' },
+          { label: 'T-Shirts & Tops', href: '/allproducts?category=men&subcategory=t-shirts' },
+          { label: 'Hoodies & Sweatshirts', href: '/allproducts?category=men&subcategory=hoodies' },
+          { label: 'Jackets & Vests', href: '/allproducts?category=men&subcategory=jackets' },
+          { label: 'Pants & Tights', href: '/allproducts?category=men&subcategory=pants' },
+          { label: 'Shorts', href: '/allproducts?category=men&subcategory=shorts' },
+        ],
+      },
+      {
+        title: 'Featured',
+        links: [
+          { label: 'New Releases', href: '/allproducts?category=men&sort=new' },
+          { label: 'Best Sellers', href: '/allproducts?category=men&sort=best-sellers' },
+          { label: 'Member Exclusive', href: '/allproducts?category=men&sort=member' },
+        ],
+      }
+    ]
+  },
+  {
+    id: 'women',
+    label: 'Women',
+    columns: [
+      {
+        title: 'Clothing',
+        links: [
+          { label: 'All Clothing', href: '/allproducts?category=women&subcategory=clothing' },
+          { label: 'T-Shirts & Tops', href: '/allproducts?category=women&subcategory=t-shirts' },
+          { label: 'Hoodies & Sweatshirts', href: '/allproducts?category=women&subcategory=hoodies' },
+          { label: 'Jackets & Vests', href: '/allproducts?category=women&subcategory=jackets' },
+          { label: 'Pants & Tights', href: '/allproducts?category=women&subcategory=pants' },
+          { label: 'Sports Bras', href: '/allproducts?category=women&subcategory=sports-bras' },
+        ],
+      },
+      {
+        title: 'Featured',
+        links: [
+          { label: 'New Releases', href: '/allproducts?category=women&sort=new' },
+          { label: 'Best Sellers', href: '/allproducts?category=women&sort=best-sellers' },
+          { label: 'Member Exclusive', href: '/allproducts?category=women&sort=member' },
+        ],
+      }
+    ]
+  },
+  {
+    id: 'shoes',
+    label: 'Shoes',
+    columns: [
+      {
+        title: 'By Activity',
+        links: [
+          { label: 'All Shoes', href: '/allproducts?category=shoes' },
+          { label: 'Running', href: '/allproducts?category=shoes&subcategory=running' },
+          { label: 'Basketball', href: '/allproducts?category=shoes&subcategory=basketball' },
+          { label: 'Football', href: '/allproducts?category=shoes&subcategory=football' },
+          { label: 'Training & Gym', href: '/allproducts?category=shoes&subcategory=training' },
+          { label: 'Lifestyle', href: '/allproducts?category=shoes&subcategory=lifestyle' },
+        ],
+      }
+    ]
+  },
+  {
+    id: 'accessories',
+    label: 'Accessories',
+    columns: [
+      {
+        title: 'All Accessories',
+        links: [
+          { label: 'Bags & Backpacks', href: '/allproducts?category=accessories&subcategory=bags' },
+          { label: 'Socks', href: '/allproducts?category=accessories&subcategory=socks' },
+          { label: 'Hats & Headwear', href: '/allproducts?category=accessories&subcategory=hats' },
+          { label: 'Water Bottles', href: '/allproducts?category=accessories&subcategory=water-bottles' },
+        ],
+      }
+    ]
+  },
+  {
+    id: 'equipment',
+    label: 'Equipment',
+    columns: [
+      {
+        title: 'Sports Equipment',
+        links: [
+          { label: 'Balls', href: '/allproducts?category=equipment&subcategory=balls' },
+          { label: 'Yoga Mats', href: '/allproducts?category=equipment&subcategory=yoga-mats' },
+          { label: 'Resistance Bands', href: '/allproducts?category=equipment&subcategory=bands' },
+          { label: 'Weights', href: '/allproducts?category=equipment&subcategory=weights' },
+        ],
+      }
+    ]
+  }
+];
 
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeMobileCategory, setActiveMobileCategory] = useState(null);
+  
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const dropdownTimeout = useRef(null);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -69,19 +174,89 @@ function Header() {
     navigate('/allproducts');
   };
 
+  const handleMouseEnter = (id) => {
+    if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
+    setActiveDropdown(id);
+  };
+
+  const handleMouseLeave = () => {
+    dropdownTimeout.current = setTimeout(() => {
+      setActiveDropdown(null);
+    }, 150); // Small debounce to prevent flickering
+  };
+
+  const toggleMobileCategory = (id) => {
+    setActiveMobileCategory(prev => (prev === id ? null : id));
+  };
+  
+  const handleLinkClick = (href) => {
+    setIsMobileMenuOpen(false);
+    setActiveDropdown(null);
+    // Clear search key when navigating via mega menu
+    setSearchkey('');
+    navigate(href);
+  };
+
   return (
-    <header className="w-full bg-white z-50 sticky top-0 font-sans">
-      <div className="h-[60px] flex items-center justify-between px-6 lg:px-10 border-b border-[#E5E5E5] bg-white">
-        <Link to="/" className="flex-shrink-0 hover:opacity-70 transition-opacity">
+    <>
+    <header className="w-full bg-white z-50 sticky top-0 font-sans" onMouseLeave={handleMouseLeave}>
+      <div className="h-[60px] flex items-center justify-between px-6 lg:px-10 border-b border-[#E5E5E5] bg-white relative z-50">
+        <Link to="/" className="flex-shrink-0 hover:opacity-70 transition-opacity" onClick={() => handleLinkClick('/')}>
           <img src="/logo.png" alt="Nexor Fit Logo" className="h-10 w-auto object-contain" />
         </Link>
-
-        <nav className="hidden lg:flex items-center gap-7 font-bold text-[15px] tracking-wide text-[#111111]">
-          <button onClick={() => navigate('/allproducts?sale=true')} className="flex items-center gap-1.5 text-red-600 hover:border-b-2 border-red-600 pb-1 bg-transparent transform transition-transform hover:scale-105"><FiTag className="text-lg animate-pulse" /> Sale</button>
-          <button onClick={() => setGenderFilter('man')} className="hover:border-b-2 border-black pb-1 bg-transparent">Men</button>
-          <button onClick={() => setGenderFilter('women')} className="hover:border-b-2 border-black pb-1 bg-transparent">Women</button>
-          <button onClick={() => setGenderFilter('child')} className="hover:border-b-2 border-black pb-1 bg-transparent">Kids</button>
+        
+        <nav className="hidden lg:flex items-center gap-7 font-bold text-[15px] tracking-wide text-[#111111] h-full">
+          <button onClick={() => handleLinkClick('/allproducts?sale=true')} className="flex items-center gap-1.5 text-red-600 hover:border-b-2 border-red-600 pb-1 bg-transparent transform transition-transform hover:scale-105"><FiTag className="text-lg animate-pulse" /> Sale</button>
+          
+          {MEGA_MENU_DATA.map((category) => (
+            <div 
+              key={category.id}
+              className="h-full flex items-center cursor-pointer"
+              onMouseEnter={() => handleMouseEnter(category.id)}
+            >
+              <button 
+                className={`hover:border-b-2 pb-1 bg-transparent transition-all ${activeDropdown === category.id ? 'border-black' : 'border-transparent'}`}
+                onClick={() => handleLinkClick(`/allproducts?category=${category.id}`)}
+              >
+                {category.label}
+              </button>
+            </div>
+          ))}
         </nav>
+
+        {/* Mega Menu Dropdown */}
+        <AnimatePresence>
+            {activeDropdown && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="absolute top-[60px] left-0 w-full bg-white border-b border-gray-200 shadow-sm z-50 pointer-events-auto"
+                onMouseEnter={() => handleMouseEnter(activeDropdown)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <div className="max-w-[1920px] mx-auto px-10 py-10 flex gap-20 justify-center">
+                  {MEGA_MENU_DATA.find(c => c.id === activeDropdown)?.columns.map((column, idx) => (
+                    <div key={idx} className="flex flex-col gap-4">
+                      <h3 className="font-bold text-[#111111]">{column.title}</h3>
+                      <div className="flex flex-col gap-2">
+                        {column.links.map((link, linkIdx) => (
+                          <button 
+                            key={linkIdx} 
+                            onClick={() => handleLinkClick(link.href)}
+                            className="text-left text-gray-500 hover:text-[#111111] transition-colors text-sm"
+                          >
+                            {link.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+        </AnimatePresence>
 
         <div className="flex items-center justify-end gap-3 lg:gap-5 w-[140px] lg:w-[240px]">
           <button className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-yellow-100 transition-colors" onClick={() => setIsSearchOpen(true)}>
@@ -139,10 +314,52 @@ function Header() {
 
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed top-[60px] left-0 w-full h-[calc(100vh-60px)] bg-white z-40 p-6 flex flex-col gap-6 overflow-y-auto">
-          <button className="flex items-center gap-2 text-2xl font-bold text-red-600 text-left transform transition-transform hover:translate-x-2" onClick={() => { navigate('/allproducts?sale=true'); setIsMobileMenuOpen(false); }}><FiTag className="text-2xl animate-pulse" /> Sale</button>
-          <button className="text-2xl font-bold text-[#111111] text-left" onClick={() => { setGenderFilter('man'); setIsMobileMenuOpen(false); }}>Men</button>
-          <button className="text-2xl font-bold text-[#111111] text-left" onClick={() => { setGenderFilter('women'); setIsMobileMenuOpen(false); }}>Women</button>
-          <button className="text-2xl font-bold text-[#111111] text-left" onClick={() => { setGenderFilter('child'); setIsMobileMenuOpen(false); }}>Kids</button>
+          <button className="flex items-center gap-2 text-2xl font-bold text-red-600 text-left transform transition-transform hover:translate-x-2" onClick={() => handleLinkClick('/allproducts?sale=true')}><FiTag className="text-2xl animate-pulse" /> Sale</button>
+          
+          {/* Mobile Accordion Menu */}
+          {MEGA_MENU_DATA.map((category) => (
+            <div key={category.id} className="flex flex-col border-b border-gray-100 pb-2">
+              <button 
+                className="flex items-center justify-between text-2xl font-bold text-[#111111] text-left w-full py-2"
+                onClick={() => toggleMobileCategory(category.id)}
+              >
+                {category.label}
+                <FiChevronDown className={`transition-transform duration-300 ${activeMobileCategory === category.id ? 'rotate-180' : ''}`} />
+              </button>
+              
+              <AnimatePresence>
+                {activeMobileCategory === category.id && (
+                  <motion.div 
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden flex flex-col gap-4 mt-2"
+                  >
+                    <button 
+                      className="text-left font-bold text-gray-700 py-1 pl-4"
+                      onClick={() => handleLinkClick(`/allproducts?category=${category.id}`)}
+                    >
+                      All {category.label}
+                    </button>
+                    {category.columns.map((col, idx) => (
+                      <div key={idx} className="flex flex-col gap-2 pl-4">
+                        <span className="font-semibold text-sm text-gray-400 mt-2">{col.title}</span>
+                        {col.links.map((link, lIdx) => (
+                          <button 
+                            key={lIdx}
+                            className="text-left text-[#111111] py-1 text-lg"
+                            onClick={() => handleLinkClick(link.href)}
+                          >
+                            {link.label}
+                          </button>
+                        ))}
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
 
           <div className="mt-8 flex flex-col gap-4 text-lg font-medium text-gray-500">
             <Link to="/order" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
@@ -225,6 +442,20 @@ function Header() {
         </div>
       )}
     </header>
+    
+    {/* Dark Overlay for Mega Menu */}
+    <AnimatePresence>
+      {activeDropdown && !isMobileMenuOpen && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="hidden lg:block fixed inset-0 top-[60px] bg-black/40 backdrop-blur-sm z-30 pointer-events-none"
+        />
+      )}
+    </AnimatePresence>
+    </>
   );
 }
 

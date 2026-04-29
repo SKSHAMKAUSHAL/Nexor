@@ -1,12 +1,50 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FaPlay } from 'react-icons/fa';
-import { useContext } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import myContext from '../../context/data/myContext';
+import ResourceContext from '../../context/ResourceContext';
+import VideoModal from '../videoModal/VideoModal';
 
 function HeroSection() {
   const navigate = useNavigate();
+  const location = useLocation();
   const context = useContext(myContext);
+  const resourceContext = useContext(ResourceContext);
+  const videoRef = useRef(null);
   const { setFilterType } = context;
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  // Preload video when component mounts and on home page
+  useEffect(() => {
+    if (location.pathname === '/' && resourceContext) {
+      resourceContext.preloadVideo('/hero-video.mp4', 'hero-video');
+    }
+  }, [location.pathname, resourceContext]);
+
+  // Mark video as ready when it can play through
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !resourceContext) return;
+
+    const handleCanPlayThrough = () => {
+      resourceContext.markResourceReady('hero-video');
+    };
+
+    video.addEventListener('canplaythrough', handleCanPlayThrough);
+    return () => video.removeEventListener('canplaythrough', handleCanPlayThrough);
+  }, [resourceContext]);
+
+  // Handle ESC key to close video modal
+  useEffect(() => {
+    const handleEscKey = (e) => {
+      if (e.key === 'Escape' && isVideoModalOpen) {
+        setIsVideoModalOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscKey);
+    return () => window.removeEventListener('keydown', handleEscKey);
+  }, [isVideoModalOpen]);
 
   const navigateToAllProducts = () => {
     setFilterType('');
@@ -17,6 +55,7 @@ function HeroSection() {
     <div className="relative w-full h-screen overflow-hidden flex items-center justify-center">
       {/* Background Video */}
       <video
+        ref={videoRef}
         autoPlay
         loop
         muted
@@ -60,13 +99,20 @@ function HeroSection() {
             Explore
           </button>
           <button
-            onClick={navigateToAllProducts}
+            onClick={() => setIsVideoModalOpen(true)}
             className="flex items-center gap-2 bg-white text-black px-6 py-2.5 rounded-full font-bold text-sm md:text-base hover:bg-gray-200 transition-colors shadow-lg"
           >
             Watch <FaPlay className="text-xs" />
           </button>
         </div>
       </div>
+
+      {/* Video Modal */}
+      <VideoModal 
+        isOpen={isVideoModalOpen} 
+        onClose={() => setIsVideoModalOpen(false)} 
+        videoSrc="/hero-video.mp4"
+      />
     </div>
   );
 }
