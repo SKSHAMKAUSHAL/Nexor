@@ -147,10 +147,6 @@ Or connect your GitHub repository to Netlify for automatic deployMants.
 </div>
 
 <div align="center">
-  <img src="./public/screen4.png" alt="Nexor Fit Screenshot" />
-</div>
-
-<div align="center">
   <img src="./public/screen3.png" alt="Nexor Fit Screenshot" />
 </div>
 
