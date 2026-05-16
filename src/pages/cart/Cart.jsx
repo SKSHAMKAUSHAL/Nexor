@@ -10,8 +10,7 @@ import {
   clearCart
 } from '../../redux/cartSlice';
 import { toast } from 'react-toastify';
-import { addDoc, collection } from 'firebase/firestore';
-import { fireDB } from '../../firebase/FirebaseConfig';
+
 import { Link, useNavigate } from 'react-router-dom';
 import { processPayment } from '../../utils/razorpay';
 

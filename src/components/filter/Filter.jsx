@@ -1,4 +1,5 @@
 import { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import myContext from '../../context/data/myContext';
 
 function Filter() {
@@ -14,6 +15,8 @@ function Filter() {
     setFilterColor,
     product,
   } = context;
+
+  const navigate = useNavigate();
 
   // Dynamically extract all unique colors from all products that have colors filled from the backend
   const extractUniqueColors = () => {
@@ -39,7 +42,7 @@ function Filter() {
       }
     });
     // Filter out simple genders if they are standalone categories, as we have a separate Gender section
-    return Array.from(allCategories).filter(c => !['Man', 'Woman', 'kid', 'child'].includes(c.toLowerCase())).sort();
+    return Array.from(allCategories).filter(c => !['Man', 'Woman', 'kid', 'child', 'unisex', 'men', 'women'].includes(c.toLowerCase())).sort();
   };
 
   const dynamicCategories = extractUniqueCategories();
@@ -48,7 +51,7 @@ function Filter() {
   const sizeList = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
   const filterSections = [
-    { title: 'Gender', options: ['Man', 'Woman', 'kid'] },
+    { title: 'Gender', options: ['Men', 'Women', 'Unisex', 'Kids'] },
     { title: 'Size', options: sizeList },
     { title: 'Shop By Price', options: ['Under ₹ 2,500', '₹ 2,501 - ₹ 5,000', '₹ 5,001 - ₹ 7,500', 'Over ₹ 7,500'] },
   ];
@@ -72,7 +75,14 @@ function Filter() {
       {/* Top Filter Summary */}
       <div className="mb-6 hidden lg:block">
         <ul className="space-y-3 text-[15px] font-medium text-[#111111] mb-8">
-          <li onClick={() => { setFilterType(''); context.setSearchkey(''); }} className={`cursor-pointer hover:text-gray-600 ${!filterType ? 'font-bold' : ''}`}>All Products</li>
+          <li onClick={() => { 
+            setFilterType(''); 
+            context.setSearchkey(''); 
+            setFilterPrice('');
+            setFilterSize([]);
+            setFilterColor([]);
+            navigate('/allproducts');
+          }} className={`cursor-pointer hover:text-gray-600 ${!filterType && !window.location.search ? 'font-bold' : ''}`}>All Products</li>
           {dynamicCategories.map((cat, index) => (
             <li key={index} onClick={() => setFilterType(cat)} className={`cursor-pointer hover:text-gray-600 ${filterType === cat ? 'font-bold' : ''}`}>
               {cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -135,7 +145,11 @@ function Filter() {
                   {section.options.map((option, idx) => {
                     let isChecked = false;
                     if (section.title === 'Gender') {
-                      isChecked = filterType === (option.toLowerCase() === 'kid' ? 'child' : option.toLowerCase());
+                      let typeVal = option.toLowerCase();
+                      if (typeVal === 'kids') typeVal = 'child';
+                      if (typeVal === 'men') typeVal = 'man';
+                      if (typeVal === 'women') typeVal = 'woman';
+                      isChecked = filterType === typeVal;
                     } else if (section.title === 'Colour') {
                       isChecked = filterColor?.includes(option);
                     } else if (section.title === 'Shop By Price') {
@@ -148,8 +162,11 @@ function Filter() {
                         type="checkbox"
                         onClick={() => {
                            if(section.title === 'Gender') {
-                               const newVal = option.toLowerCase() === 'kid' ? 'child' : option.toLowerCase();
-                               setFilterType(filterType === newVal ? '' : newVal);
+                               let typeVal = option.toLowerCase();
+                               if (typeVal === 'kids') typeVal = 'child';
+                               if (typeVal === 'men') typeVal = 'man';
+                               if (typeVal === 'women') typeVal = 'woman';
+                               setFilterType(filterType === typeVal ? '' : typeVal);
                            } else if (section.title === 'Colour') {
                                if (isChecked) {
                                    setFilterColor(filterColor.filter(color => color !== option));

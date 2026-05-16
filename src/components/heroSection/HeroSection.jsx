@@ -71,46 +71,50 @@ function HeroSection() {
 
       {/* Hero Content */}
       <div className="relative z-20 text-center px-4 flex flex-col items-center mt-32 md:mt-48">
-        
-        {/* Top small text */}
-        <p className="text-white text-sm md:text-md font-bold mb-2 tracking-wide font-sans">
-          NexorTraining
-        </p>
+
+        {/* Top small text (Brand Name) */}
+        <div className="flex items-center gap-4 mb-4 opacity-90">
+          <div className="w-10 h-[2px] bg-gradient-to-r from-transparent to-white rounded-full"></div>
+          <p className="text-white text-xs md:text-sm font-bold tracking-[0.4em] uppercase font-sans drop-shadow-[0_2px_10px_rgba(255,255,255,0.5)]">
+            NEXOR FIT
+          </p>
+          <div className="w-10 h-[2px] bg-gradient-to-l from-transparent to-white rounded-full"></div>
+        </div>
 
         {/* Main Headline */}
-        <h1 
-          className="text-white text-[10vw] sm:text-[9vw] md:text-[90px] lg:text-[110px] xl:text-[130px] font-black uppercase leading-[0.8] tracking-tighter mb-4"
+        <h1
+          className="text-white text-[10vw] sm:text-[9vw] md:text-[90px] lg:text-[110px] xl:text-[130px] font-black uppercase italic leading-[0.85] tracking-tighter mb-6 drop-shadow-2xl"
           style={{ fontFamily: "'Oswald', sans-serif" }}
         >
           JUST DO THE WORK
         </h1>
 
         {/* Subtext */}
-        <p className="text-white text-sm md:text-lg font-medium mb-8">
-          Gym wear that goes as hard as you do.
+        <p className="text-white/90 text-sm md:text-lg lg:text-xl font-light tracking-wide font-sans max-w-xl mx-auto mb-10 drop-shadow-md">
+          Premium gym wear engineered to go exactly as hard as you do.
         </p>
 
         {/* Buttons */}
-        <div className="flex flex-row items-center justify-center gap-4">
+        <div className="flex flex-row items-center justify-center gap-5">
           <button
             onClick={navigateToAllProducts}
-            className="bg-white text-black px-6 py-2.5 rounded-full font-bold text-sm md:text-base hover:bg-gray-200 transition-colors shadow-lg"
+            className="bg-white text-black px-10 py-3.5 rounded-full font-bold text-sm uppercase tracking-[0.2em] hover:bg-gray-200 hover:scale-105 transition-all duration-300 transform shadow-xl"
           >
             Explore
           </button>
           <button
             onClick={() => setIsVideoModalOpen(true)}
-            className="flex items-center gap-2 bg-white text-black px-6 py-2.5 rounded-full font-bold text-sm md:text-base hover:bg-gray-200 transition-colors shadow-lg"
+            className="flex items-center gap-3 bg-black/40 backdrop-blur-md border border-white/40 text-white px-10 py-3.5 rounded-full font-bold text-sm uppercase tracking-[0.2em] hover:bg-white/10 hover:border-white hover:scale-105 transition-all duration-300 transform shadow-xl"
           >
-            Watch <FaPlay className="text-xs" />
+            Watch <FaPlay className="text-[10px]" />
           </button>
         </div>
       </div>
 
       {/* Video Modal */}
-      <VideoModal 
-        isOpen={isVideoModalOpen} 
-        onClose={() => setIsVideoModalOpen(false)} 
+      <VideoModal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
         videoSrc="/hero-video.mp4"
       />
     </div>

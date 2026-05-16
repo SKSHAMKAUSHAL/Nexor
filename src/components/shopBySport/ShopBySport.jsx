@@ -62,7 +62,7 @@ function ShopBySport() {
     <section className="text-gray-600 body-font mb-10 w-full overflow-hidden">
       <div className="mx-auto max-w-[1600px] px-5">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-left m-0" style={{ color: mode === 'dark' ? 'white' : 'black' }}>
+          <h2 className="text-4xl md:text-5xl font-black text-left m-0 font-barlow uppercase tracking-tight" style={{ color: mode === 'dark' ? 'white' : '#111' }}>
             Shop by Sport
           </h2>
         </div>
@@ -107,16 +107,19 @@ function ShopBySport() {
                 className={`w-[280px] sm:w-[400px] flex-shrink-0 cursor-pointer snap-start group p-3 sm:p-4 rounded-xl transition-all duration-300 flex flex-col ${mode === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-50 hover:bg-gray-100'}`}
                 onClick={handleCardClick}
               >
-                <div className="relative w-full aspect-[4/5] overflow-hidden mb-4 rounded-lg flex-shrink-0">
+                <div className="relative w-full aspect-[4/5] overflow-hidden mb-0 rounded-xl flex-shrink-0">
                   <img
                     src={sport.image}
                     alt={sport.title}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-300" />
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <h3 className="font-barlow font-bold text-2xl md:text-3xl text-white uppercase tracking-wide transform transition-transform duration-300 group-hover:-translate-y-2">
+                      {sport.title}
+                    </h3>
+                  </div>
                 </div>
-                <h3 className="text-xl font-medium px-2 pb-2 mt-auto" style={{ color: mode === 'dark' ? 'white' : 'black' }}>
-                  {sport.title}
-                </h3>
               </div>
             ))}
           </div>

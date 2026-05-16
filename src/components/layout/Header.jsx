@@ -1,4 +1,4 @@
-import { useContext, useState, useRef, useEffect } from 'react';
+import { Fragment, useContext, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiUser, FiLogOut, FiTag, FiChevronDown } from 'react-icons/fi';
 import { toast } from 'react-toastify';
@@ -8,51 +8,51 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const MEGA_MENU_DATA = [
   {
-    id: 'men',
+    id: 'man',
     label: 'Men',
     columns: [
       {
         title: 'Clothing',
         links: [
-          { label: 'All Clothing', href: '/allproducts?category=men&subcategory=clothing' },
-          { label: 'T-Shirts & Tops', href: '/allproducts?category=men&subcategory=t-shirts' },
-          { label: 'Hoodies & Sweatshirts', href: '/allproducts?category=men&subcategory=hoodies' },
-          { label: 'Jackets & Vests', href: '/allproducts?category=men&subcategory=jackets' },
-          { label: 'Pants & Tights', href: '/allproducts?category=men&subcategory=pants' },
-          { label: 'Shorts', href: '/allproducts?category=men&subcategory=shorts' },
+          { label: 'All Clothing', href: '/allproducts?category=man&subcategory=clothing' },
+          { label: 'T-Shirts & Tops', href: '/allproducts?category=man&subcategory=t-shirts' },
+          { label: 'Hoodies & Sweatshirts', href: '/allproducts?category=man&subcategory=hoodies' },
+          { label: 'Jackets & Vests', href: '/allproducts?category=man&subcategory=jackets' },
+          { label: 'Pants & Tights', href: '/allproducts?category=man&subcategory=pants' },
+          { label: 'Shorts', href: '/allproducts?category=man&subcategory=shorts' },
         ],
       },
       {
         title: 'Featured',
         links: [
-          { label: 'New Releases', href: '/allproducts?category=men&sort=new' },
-          { label: 'Best Sellers', href: '/allproducts?category=men&sort=best-sellers' },
-          { label: 'Member Exclusive', href: '/allproducts?category=men&sort=member' },
+          { label: 'New Releases', href: '/allproducts?category=man&sort=new' },
+          { label: 'Best Sellers', href: '/allproducts?category=man&sort=best-sellers' },
+          { label: 'Member Exclusive', href: '/allproducts?category=man&sort=member' },
         ],
       }
     ]
   },
   {
-    id: 'women',
+    id: 'woman',
     label: 'Women',
     columns: [
       {
         title: 'Clothing',
         links: [
-          { label: 'All Clothing', href: '/allproducts?category=women&subcategory=clothing' },
-          { label: 'T-Shirts & Tops', href: '/allproducts?category=women&subcategory=t-shirts' },
-          { label: 'Hoodies & Sweatshirts', href: '/allproducts?category=women&subcategory=hoodies' },
-          { label: 'Jackets & Vests', href: '/allproducts?category=women&subcategory=jackets' },
-          { label: 'Pants & Tights', href: '/allproducts?category=women&subcategory=pants' },
-          { label: 'Sports Bras', href: '/allproducts?category=women&subcategory=sports-bras' },
+          { label: 'All Clothing', href: '/allproducts?category=woman&subcategory=clothing' },
+          { label: 'T-Shirts & Tops', href: '/allproducts?category=woman&subcategory=t-shirts' },
+          { label: 'Hoodies & Sweatshirts', href: '/allproducts?category=woman&subcategory=hoodies' },
+          { label: 'Jackets & Vests', href: '/allproducts?category=woman&subcategory=jackets' },
+          { label: 'Pants & Tights', href: '/allproducts?category=woman&subcategory=pants' },
+          { label: 'Sports Bras', href: '/allproducts?category=woman&subcategory=sports-bras' },
         ],
       },
       {
         title: 'Featured',
         links: [
-          { label: 'New Releases', href: '/allproducts?category=women&sort=new' },
-          { label: 'Best Sellers', href: '/allproducts?category=women&sort=best-sellers' },
-          { label: 'Member Exclusive', href: '/allproducts?category=women&sort=member' },
+          { label: 'New Releases', href: '/allproducts?category=woman&sort=new' },
+          { label: 'Best Sellers', href: '/allproducts?category=woman&sort=best-sellers' },
+          { label: 'Member Exclusive', href: '/allproducts?category=woman&sort=member' },
         ],
       }
     ]
@@ -117,7 +117,7 @@ function Header() {
 
   const navigate = useNavigate();
   const context = useContext(myContext);
-  const { searchkey, setSearchkey, setFilterType, product } = context;
+  const { searchkey, setSearchkey, setFilterType, setFilterPrice, setFilterSize, setFilterColor, product } = context;
 
   const cartItems = useSelector((state) => state.cart) || [];
   const cartItemCount = cartItems.reduce((total, item) => total + (item.quantity || 1), 0);
@@ -146,13 +146,6 @@ function Header() {
     navigate(`/productinfo/${item.id}`);
   };
 
-  const handleSearchToAllProducts = () => {
-    if (searchkey.trim()) {
-      setIsSearchOpen(false);
-      navigate('/allproducts');
-    }
-  };
-
   const handleProfileClick = () => {
     if (isLoggedIn) {
       setIsProfileMenuOpen((prev) => !prev);
@@ -166,12 +159,6 @@ function Header() {
     setIsProfileMenuOpen(false);
     toast.success('Logged out successfully');
     navigate('/');
-  };
-
-  const setGenderFilter = (gender) => {
-    setSearchkey('');
-    setFilterType(gender);
-    navigate('/allproducts');
   };
 
   const handleMouseEnter = (id) => {
@@ -192,8 +179,12 @@ function Header() {
   const handleLinkClick = (href) => {
     setIsMobileMenuOpen(false);
     setActiveDropdown(null);
-    // Clear search key when navigating via mega menu
+    // Clear all filters when navigating
     setSearchkey('');
+    setFilterType('');
+    if (setFilterPrice) setFilterPrice('');
+    if (setFilterSize) setFilterSize([]);
+    if (setFilterColor) setFilterColor([]);
     navigate(href);
   };
 

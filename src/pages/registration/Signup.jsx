@@ -4,7 +4,7 @@ import myContext from '../../context/data/myContext';
 import { toast } from 'react-toastify';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, fireDB } from '../../firebase/FirebaseConfig';
-import { Timestamp, addDoc, collection, doc, setDoc } from 'firebase/firestore';
+import { Timestamp, doc, setDoc } from 'firebase/firestore';
 import Loader from '../../components/loader/Loader';
 
 function Signup() {
@@ -50,7 +50,6 @@ function Signup() {
                 }),
                 time: Timestamp.now()
             }
-            const userRef = collection(fireDB, "users")
             await setDoc(doc(fireDB, "users", users.user.uid), user);
 
             // AUTO-LOGIN LOGIC:

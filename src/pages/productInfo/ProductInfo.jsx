@@ -283,8 +283,14 @@ function ProductInfo() {
                             <h1 className="text-2xl font-medium mb-1">
                                 {products.title}
                             </h1>
-                            <h2 className="text-base mb-4 font-medium" style={{ color: mode === 'dark' ? '#ccc' : '#707072' }}>
-                                {products.category || "Man's Therma-FIT Jacket"}
+                            <h2 className="text-base mb-4 font-medium capitalize" style={{ color: mode === 'dark' ? '#ccc' : '#707072' }}>
+                                {products.type ? 
+                                    `${products.type.toLowerCase() === 'man' ? "Men's" : 
+                                      products.type.toLowerCase() === 'woman' ? "Women's" : 
+                                      products.type.toLowerCase() === 'child' ? "Kids'" : 
+                                      products.type.toLowerCase() === 'unisex' ? "Unisex" : 
+                                      products.type} ${products.category || ''}` 
+                                    : (products.category || "Men's Therma-FIT Jacket")}
                             </h2>
                             
                             <div className="mb-4">

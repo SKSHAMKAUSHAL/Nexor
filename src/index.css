@@ -5,6 +5,7 @@
 @layer base {
   html {
     font-family: 'Oswald', 'Outfit', sans-serif;
+    font-size: 80%;
   }
 }
 

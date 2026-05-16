@@ -115,7 +115,20 @@ function Allproducts() {
       .filter((obj) => {
         if (categoryParam) {
           const itemCategory = (obj.category || '').toLowerCase();
-          return itemCategory.includes(categoryParam);
+          const itemType = (obj.type || '').toLowerCase();
+          
+          if (categoryParam === 'man') {
+            const catWords = itemCategory.split(/[\s,-]+/);
+            const typeWords = itemType.split(/[\s,-]+/);
+            return catWords.includes('man') || catWords.includes('men') || typeWords.includes('man') || typeWords.includes('men') || typeWords.includes('unisex') || catWords.includes('unisex');
+          }
+          if (categoryParam === 'woman') {
+            const catWords = itemCategory.split(/[\s,-]+/);
+            const typeWords = itemType.split(/[\s,-]+/);
+            return catWords.includes('woman') || catWords.includes('women') || typeWords.includes('woman') || typeWords.includes('women') || typeWords.includes('unisex') || catWords.includes('unisex');
+          }
+          
+          return itemCategory.includes(categoryParam) || itemType.includes(categoryParam);
         }
         return true;
       })
@@ -162,26 +175,91 @@ function Allproducts() {
         <div className="max-w-[1920px] mx-auto px-4 md:px-8 py-8">
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 sticky top-0 bg-white z-20 py-4">
-            <div className="flex items-center gap-4 mb-4 md:mb-0">
+            <div className="flex items-center gap-4 mb-4 md:mb-0 flex-wrap">
               <h1 className="text-[24px] tracking-tight font-bold text-black font-oswald capitalize shadow-sm">
                 {isSaleFilterActive ? 'Sale Products' : searchkey ? `Search Results: ${searchkey}` : categoryParam ? `${categoryParam} ${subcategoryParam || 'Products'}` : filterType ? (['man', 'Woman', 'child'].includes(filterType.toLowerCase()) ? `${filterType.replace('man', 'Man').replace('child', 'kid')} Clothing` : filterType) : 'All Products'} ({filteredProducts.length})
               </h1>
-              {isSaleFilterActive && (
-                <button 
-                  onClick={() => navigate('/allproducts')}
-                  className="flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-full py-1 px-3 text-sm transition-all hover:shadow-md"
-                >
-                  Clear Sale Filter <FaTimes className="ml-2 w-3 h-3" />
-                </button>
-              )}
-              {searchkey && !isSaleFilterActive && (
-                <button 
-                  onClick={() => context.setSearchkey('')}
-                  className="flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-full py-1 px-3 text-sm transition-all hover:shadow-md"
-                >
-                  Clear Search <FaTimes className="ml-2 w-3 h-3" />
-                </button>
-              )}
+              
+              <div className="flex flex-wrap gap-2">
+                {isSaleFilterActive && (
+                  <button 
+                    onClick={() => {
+                      const params = new URLSearchParams(window.location.search);
+                      params.delete('sale');
+                      navigate(`/allproducts?${params.toString()}`);
+                    }}
+                    className="flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-full py-1 px-3 text-sm transition-all hover:shadow-md"
+                  >
+                    Sale <FaTimes className="ml-2 w-3 h-3" />
+                  </button>
+                )}
+                {searchkey && !isSaleFilterActive && (
+                  <button 
+                    onClick={() => context.setSearchkey('')}
+                    className="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-full py-1 px-3 text-sm transition-all hover:shadow-md"
+                  >
+                    "{searchkey}" <FaTimes className="ml-2 w-3 h-3" />
+                  </button>
+                )}
+                {categoryParam && (
+                  <button 
+                    onClick={() => {
+                      const params = new URLSearchParams(window.location.search);
+                      params.delete('category');
+                      navigate(`/allproducts?${params.toString()}`);
+                    }}
+                    className="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-full py-1 px-3 text-sm transition-all hover:shadow-md capitalize"
+                  >
+                    {categoryParam} <FaTimes className="ml-2 w-3 h-3" />
+                  </button>
+                )}
+                {subcategoryParam && (
+                  <button 
+                    onClick={() => {
+                      const params = new URLSearchParams(window.location.search);
+                      params.delete('subcategory');
+                      navigate(`/allproducts?${params.toString()}`);
+                    }}
+                    className="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-full py-1 px-3 text-sm transition-all hover:shadow-md capitalize"
+                  >
+                    {subcategoryParam} <FaTimes className="ml-2 w-3 h-3" />
+                  </button>
+                )}
+                {filterType && (
+                  <button 
+                    onClick={() => context.setFilterType('')}
+                    className="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-full py-1 px-3 text-sm transition-all hover:shadow-md capitalize"
+                  >
+                    {filterType === 'child' ? 'kid' : filterType} <FaTimes className="ml-2 w-3 h-3" />
+                  </button>
+                )}
+                {filterPrice && (
+                  <button 
+                    onClick={() => context.setFilterPrice('')}
+                    className="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-full py-1 px-3 text-sm transition-all hover:shadow-md"
+                  >
+                    {filterPrice} <FaTimes className="ml-2 w-3 h-3" />
+                  </button>
+                )}
+                {filterSize && filterSize.length > 0 && filterSize.map(size => (
+                  <button 
+                    key={size}
+                    onClick={() => context.setFilterSize(filterSize.filter(s => s !== size))}
+                    className="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-full py-1 px-3 text-sm transition-all hover:shadow-md uppercase"
+                  >
+                    Size: {size} <FaTimes className="ml-2 w-3 h-3" />
+                  </button>
+                ))}
+                {filterColor && filterColor.length > 0 && filterColor.map(color => (
+                  <button 
+                    key={color}
+                    onClick={() => context.setFilterColor(filterColor.filter(c => c !== color))}
+                    className="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-full py-1 px-3 text-sm transition-all hover:shadow-md capitalize"
+                  >
+                    {color} <FaTimes className="ml-2 w-3 h-3" />
+                  </button>
+                ))}
+              </div>
             </div>
             
             <div className="flex items-center text-[#111111] gap-6">
