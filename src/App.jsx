@@ -104,7 +104,7 @@ function AppContent() {
           pauseOnFocusLoss
           draggable={false}
           pauseOnHover
-          theme="colored"
+          theme="light"
           limit={3}
         />
       </Router>
